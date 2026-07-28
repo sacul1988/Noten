@@ -122,12 +122,12 @@ const TonleiterApp = (function () {
     }
 
     const levels = [
-        makeLevel({ label: "C-Dur mit Klaviatur und Schema", types: ["dur"],
-                    roots: { dur: ["c/4"] }, keyboard: true, labels: true, schema: true }),
         makeLevel({ label: "Dur mit Klaviatur und Schema", types: ["dur"],
                     roots: { dur: DUR_LEICHT }, keyboard: true, labels: true, schema: true }),
+        makeLevel({ label: "Mehr Dur-Tonarten mit Schema", types: ["dur"],
+                    roots: { dur: DUR_MITTEL }, keyboard: true, labels: true, schema: true }),
         makeLevel({ label: "Dur mit Klaviatur", types: ["dur"],
-                    roots: { dur: DUR_MITTEL }, keyboard: true, labels: false, schema: false }),
+                    roots: { dur: DUR_ALLE }, keyboard: true, labels: false, schema: false }),
         makeLevel({ label: "Moll mit Klaviatur und Schema", types: ["moll"],
                     roots: { moll: MOLL_LEICHT }, keyboard: true, labels: true, schema: true }),
         makeLevel({ label: "Moll mit Klaviatur", types: ["moll"],

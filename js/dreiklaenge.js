@@ -4,7 +4,8 @@
    ========================================================================== */
 const DreiklangApp = (function () {
 
-    const DUR_LEICHT = ["c/4", "f/4", "g/4"];
+    const DUR_LEICHT = ["c/4", "f/4", "g/4", "d/4"];
+    const MOLL_LEICHT = ["a/4", "d/4", "e/4", "g/4"];
     const DUR_ALLE   = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "bb/4", "eb/4"];
     const MOLL_ALLE  = ["a/4", "d/4", "e/4", "g/4", "b/4", "c/4", "f#/4"];
 
@@ -140,13 +141,13 @@ const DreiklangApp = (function () {
         bauLevel("Dur mit Klaviatur und Hilfe", {
             types: ["dur"], roots: { dur: DUR_LEICHT }, keyboard: true, hint: true }),
         bauLevel("Dur und Moll mit Klaviatur und Hilfe", {
-            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: ["a/4", "d/4", "e/4"] },
+            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: MOLL_LEICHT },
             keyboard: true, hint: true }),
         bauLevel("Dur und Moll mit Klaviatur", {
             types: ["dur", "moll"], roots: { dur: DUR_ALLE, moll: MOLL_ALLE },
             keyboard: true, hint: false }),
         bauLevel("In Noten schreiben, mit Hilfe", {
-            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: ["a/4", "d/4", "e/4"] },
+            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: MOLL_LEICHT },
             keyboard: false, hint: true }),
         bauLevel("In Noten schreiben", {
             types: ["dur", "moll"], roots: { dur: DUR_ALLE, moll: MOLL_ALLE },

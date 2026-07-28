@@ -584,12 +584,15 @@ const Core = (function () {
 
     function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
-    // Wählt aus list, vermeidet dabei die zuletzt gezogenen Einträge.
+    /* Wählt aus list und vermeidet dabei die zuletzt gezogenen Einträge.
+       Bei kurzen Listen wird weniger gesperrt, sonst bliebe rechnerisch nur
+       noch ein Kandidat übrig und die Reihenfolge wäre vorhersehbar. */
     function pickFresh(list, recent, memory) {
+        const limit = Math.max(1, Math.min(memory || 3, list.length - 2));
         const fresh = list.filter(function (x) { return recent.indexOf(x) === -1; });
         const chosen = pick(fresh.length ? fresh : list);
         recent.push(chosen);
-        while (recent.length > (memory || 3)) recent.shift();
+        while (recent.length > limit) recent.shift();
         return chosen;
     }
 

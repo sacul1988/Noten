@@ -33,8 +33,9 @@
         /* Im Noten-Modul sind schwarze Tasten nicht klickbar */
         #module-noten .piano-key.black { cursor: default; }
 
-        /* Große Klaviatur */
-        .piano-container.large { flex-wrap: wrap; max-width: 900px; justify-content: center; }
+        /* Große Klaviatur: am Stück und mittig, bei Platzmangel scrollbar */
+        .piano-container.large { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+                                 width: fit-content; max-width: 100%; margin: 25px auto; }
         .piano-container.large .piano-key { width: 40px; height: 140px; font-size: 0.8rem; }
         .piano-container.large .piano-key.black { width: 28px; height: 85px; margin-left: -14px; margin-right: -14px; }
 
@@ -80,9 +81,12 @@
 .answer-grid.dense { gap: 7px; }
 .answer-grid.dense .answer-btn { min-width: 84px; padding: 11px 10px; font-size: 0.95rem; }
 
-/* Breite Klaviatur der neuen Module: nicht umbrechen, notfalls scrollen */
+/* Breite Klaviatur der neuen Module: nicht umbrechen, notfalls scrollen.
+   fit-content plus automatische Seitenränder hält sie mittig, solange sie
+   hineinpasst; erst darüber hinaus wird gescrollt. */
 .piano-container.wide { display: none; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
-                        justify-content: flex-start; padding: 4px 4px 10px 4px; }
+                        justify-content: flex-start; padding: 4px 4px 10px 4px;
+                        width: fit-content; max-width: 100%; margin: 25px auto 0 auto; }
 .piano-container.wide .piano-key { flex: none; width: 40px; height: 140px; font-size: 0.8rem; }
 .piano-container.wide .piano-key.black { width: 28px; height: 85px; margin-left: -14px; margin-right: -14px; }
 
