@@ -146,11 +146,19 @@ button:disabled { background: #d0d5dd !important; cursor: not-allowed !important
     background: var(--modul, var(--akzent));
     transition: width .18s ease;
 }
+/* Die Karte ist ein <button>. Ohne diese Zeilen färbt die allgemeine
+   Button-Regel sie beim Überfahren voll ein und der Text verschwindet. */
+.menu-card, .menu-card:hover, .menu-card:focus, .menu-card:active {
+    background: var(--flaeche);
+    color: var(--text);
+}
 .menu-card:hover {
     border-color: var(--modul, var(--akzent));
     box-shadow: 0 10px 26px rgba(16, 24, 40, .10);
     transform: translateY(-3px);
 }
+.menu-card:active { transform: translateY(-1px); }
+.menu-card:focus-visible { outline: 2px solid var(--modul, var(--akzent)); outline-offset: 3px; }
 .menu-card:hover::before { width: 7px; }
 
 .card-num {
