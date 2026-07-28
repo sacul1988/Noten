@@ -4,10 +4,13 @@
    ========================================================================== */
 const DreiklangApp = (function () {
 
-    const DUR_LEICHT = ["c/4", "f/4", "g/4", "d/4"];
-    const MOLL_LEICHT = ["a/4", "d/4", "e/4", "g/4"];
-    const DUR_ALLE   = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "bb/4", "eb/4"];
-    const MOLL_ALLE  = ["a/4", "d/4", "e/4", "g/4", "b/4", "c/4", "f#/4"];
+    /* Grundtöne auf allen Stammtönen, über anderthalb Oktaven verteilt.
+       Weiter hinauf geht es nicht: über f/5 läge die Quinte jenseits der
+       Klaviatur, die bei c/6 endet. */
+    const STAMMTOENE = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4",
+                        "c/5", "d/5", "e/5", "f/5"];
+    const DUR_ALLE  = STAMMTOENE.concat(["bb/4", "eb/4", "ab/4"]);
+    const MOLL_ALLE = STAMMTOENE.concat(["f#/4", "bb/4", "c#/5"]);
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
@@ -31,7 +34,7 @@ const DreiklangApp = (function () {
 
     function bauen(ctx, opts) {
         const type = opts.types.length > 1 ? Core.pick(opts.types) : opts.types[0];
-        const root = Core.pickFresh(opts.roots[type], recent, 2);
+        const root = Core.pickFresh(opts.roots[type], recent, 2, Core.german);
         const triad = Core.buildTriad(root, type);
         let placed = 1;
 
@@ -92,7 +95,7 @@ const DreiklangApp = (function () {
 
     function benennen(ctx) {
         const type = Core.pick(["dur", "moll"]);
-        const root = Core.pickFresh(type === "dur" ? DUR_ALLE : MOLL_ALLE, recent, 2);
+        const root = Core.pickFresh(type === "dur" ? DUR_ALLE : MOLL_ALLE, recent, 2, Core.german);
         const triad = Core.buildTriad(root, type);
 
         drawChord(ctx, triad);
@@ -136,16 +139,15 @@ const DreiklangApp = (function () {
     }
 
     const levels = [
-        bauLevel("Dur mit Klaviatur und Hilfe", {
-            types: ["dur"], roots: { dur: DUR_LEICHT }, keyboard: true, hint: true }),
-        bauLevel("Dur und Moll mit Klaviatur und Hilfe", {
-            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: MOLL_LEICHT },
-            keyboard: true, hint: true }),
+        bauLevel("Nur Dur, mit Klaviatur und Hilfe", {
+            types: ["dur"], roots: { dur: STAMMTOENE }, keyboard: true, hint: true }),
+        bauLevel("Nur Moll, mit Klaviatur und Hilfe", {
+            types: ["moll"], roots: { moll: STAMMTOENE }, keyboard: true, hint: true }),
         bauLevel("Dur und Moll mit Klaviatur", {
             types: ["dur", "moll"], roots: { dur: DUR_ALLE, moll: MOLL_ALLE },
             keyboard: true, hint: false }),
         bauLevel("In Noten schreiben, mit Hilfe", {
-            types: ["dur", "moll"], roots: { dur: DUR_LEICHT, moll: MOLL_LEICHT },
+            types: ["dur", "moll"], roots: { dur: STAMMTOENE, moll: STAMMTOENE },
             keyboard: false, hint: true }),
         bauLevel("In Noten schreiben", {
             types: ["dur", "moll"], roots: { dur: DUR_ALLE, moll: MOLL_ALLE },

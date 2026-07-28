@@ -619,12 +619,16 @@ const Core = (function () {
 
     /* Wählt aus list und vermeidet dabei die zuletzt gezogenen Einträge.
        Bei kurzen Listen wird weniger gesperrt, sonst bliebe rechnerisch nur
-       noch ein Kandidat übrig und die Reihenfolge wäre vorhersehbar. */
-    function pickFresh(list, recent, memory) {
-        const limit = Math.max(1, Math.min(memory || 3, list.length - 2));
-        const fresh = list.filter(function (x) { return recent.indexOf(x) === -1; });
+       noch ein Kandidat übrig und die Reihenfolge wäre vorhersehbar.
+       merkmal bestimmt, was als "schon dagewesen" gilt — bei Grundtönen in
+       mehreren Oktaven soll der Notenname zählen, nicht die Lage. */
+    function pickFresh(list, recent, memory, merkmal) {
+        const kennung = merkmal || function (x) { return x; };
+        const verschieden = new Set(list.map(kennung)).size;
+        const limit = Math.max(1, Math.min(memory || 3, verschieden - 2));
+        const fresh = list.filter(function (x) { return recent.indexOf(kennung(x)) === -1; });
         const chosen = pick(fresh.length ? fresh : list);
-        recent.push(chosen);
+        recent.push(kennung(chosen));
         while (recent.length > limit) recent.shift();
         return chosen;
     }

@@ -4,11 +4,13 @@
    ========================================================================== */
 const TonleiterApp = (function () {
 
-    const DUR_LEICHT   = ["c/4", "g/4", "f/4"];
-    const DUR_MITTEL   = ["c/4", "g/4", "d/4", "f/4", "bb/4"];
-    const DUR_ALLE     = ["c/4", "g/4", "d/4", "a/4", "f/4", "bb/4", "eb/4"];
-    const MOLL_LEICHT  = ["a/4", "e/4", "d/4"];
-    const MOLL_ALLE    = ["a/4", "e/4", "b/4", "d/4", "g/4"];
+    /* Der Grundton bleibt in der vierten Oktave, damit die Leiter samt
+       Oktavton auf die Klaviatur passt, die bei c/6 endet. Auf allen sieben
+       Stammtönen lässt sich sowohl Dur als auch harmonisch Moll bilden,
+       ohne dass unübliche Schreibweisen entstehen. */
+    const STAMMTOENE = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4"];
+    const DUR_ALLE   = STAMMTOENE.concat(["bb/4", "eb/4"]);
+    const MOLL_ALLE  = STAMMTOENE.slice();
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
@@ -48,7 +50,7 @@ const TonleiterApp = (function () {
             label: opts.label,
             start: function (ctx) {
                 type = opts.types.length > 1 ? Core.pick(opts.types) : opts.types[0];
-                const root = Core.pickFresh(opts.roots[type], recent, 2);
+                const root = Core.pickFresh(opts.roots[type], recent, 2, Core.german);
                 scale = Core.buildScale(root, type);
                 placed = 1;
 
@@ -120,20 +122,20 @@ const TonleiterApp = (function () {
     }
 
     const levels = [
-        makeLevel({ label: "Dur mit Klaviatur und Schema", types: ["dur"],
-                    roots: { dur: DUR_LEICHT }, keyboard: true, labels: true, schema: true }),
-        makeLevel({ label: "Mehr Dur-Tonarten mit Schema", types: ["dur"],
-                    roots: { dur: DUR_MITTEL }, keyboard: true, labels: true, schema: true }),
+        makeLevel({ label: "Nur Dur, mit Klaviatur und Schema", types: ["dur"],
+                    roots: { dur: STAMMTOENE }, keyboard: true, labels: true, schema: true }),
+        makeLevel({ label: "Nur Moll, mit Klaviatur und Schema", types: ["moll"],
+                    roots: { moll: MOLL_ALLE }, keyboard: true, labels: true, schema: true }),
+        makeLevel({ label: "Dur und Moll mit Schema", types: ["dur", "moll"],
+                    roots: { dur: DUR_ALLE, moll: MOLL_ALLE }, keyboard: true, labels: true, schema: true }),
         makeLevel({ label: "Dur mit Klaviatur", types: ["dur"],
                     roots: { dur: DUR_ALLE }, keyboard: true, labels: false, schema: false }),
-        makeLevel({ label: "Moll mit Klaviatur und Schema", types: ["moll"],
-                    roots: { moll: MOLL_LEICHT }, keyboard: true, labels: true, schema: true }),
         makeLevel({ label: "Moll mit Klaviatur", types: ["moll"],
                     roots: { moll: MOLL_ALLE }, keyboard: true, labels: false, schema: false }),
         makeLevel({ label: "Dur und Moll mit Klaviatur", types: ["dur", "moll"],
                     roots: { dur: DUR_ALLE, moll: MOLL_ALLE }, keyboard: true, labels: false, schema: false }),
         makeLevel({ label: "Dur ohne Klaviatur", types: ["dur"],
-                    roots: { dur: DUR_MITTEL }, keyboard: false, schema: true }),
+                    roots: { dur: DUR_ALLE }, keyboard: false, schema: true }),
         makeLevel({ label: "Dur und Moll ohne Hilfen", types: ["dur", "moll"],
                     roots: { dur: DUR_ALLE, moll: MOLL_ALLE }, keyboard: false, schema: false })
     ];
