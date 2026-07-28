@@ -346,7 +346,8 @@ const Core = (function () {
                 '<div class="js-unlock-icon"></div>' +
                 '<p class="js-unlock-text">Gib das Passwort ein:</p>' +
                 '<div class="js-unlock-input-wrap">' +
-                    '<input type="password" class="unlock-input js-unlock-input">' +
+                    '<input type="text" class="unlock-input js-unlock-input" ' +
+                        'autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">' +
                 '</div>' +
                 '<div class="js-unlock-actions" style="display:flex;gap:10px">' +
                     '<button class="modal-btn js-unlock-cancel" style="background:#98a2b3">Abbrechen</button>' +

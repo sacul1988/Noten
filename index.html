@@ -79,7 +79,7 @@
             <div id="n-unlockIcon"></div>
             <p id="n-unlockText">Gib das Passwort ein:</p>
             <div id="n-passwordContainer">
-                <input type="password" id="n-unlockPassword" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') NotenApp.checkUnlockPassword()">
+                <input type="text" id="n-unlockPassword" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') NotenApp.checkUnlockPassword()">
             </div>
             <div id="n-unlockActionBtns" style="display: flex; gap: 10px;">
                 <button id="n-unlockCancelBtn" class="modal-btn" style="background: #98a2b3;" onclick="document.getElementById('n-unlockModal').style.display='none'">Abbrechen</button>
@@ -224,7 +224,7 @@
             <div id="v-unlockIcon"></div>
             <p id="v-unlockText">Gib das Passwort ein:</p>
             <div id="v-passwordContainer">
-                <input type="password" id="v-unlockPassword" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') VorzeichenApp.checkUnlockPassword()">
+                <input type="text" id="v-unlockPassword" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') VorzeichenApp.checkUnlockPassword()">
             </div>
             <div id="v-unlockActionBtns" style="display: flex; gap: 10px;">
                 <button id="v-unlockCancelBtn" class="modal-btn" style="background: #98a2b3;" onclick="document.getElementById('v-unlockModal').style.display='none'">Abbrechen</button>
