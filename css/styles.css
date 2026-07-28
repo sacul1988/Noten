@@ -97,28 +97,95 @@ button:disabled { background: #d0d5dd !important; cursor: not-allowed !important
 
 /* ---------------------------------------------------------- Startmenü */
 
-#main-menu h1 { margin: 4px 0 6px; font-size: 2rem; }
-#main-menu > p { color: var(--text-leise); margin: 0 0 4px; }
+.menu-page { padding: 0 0 34px; overflow: hidden; }
+
+/* Kopfbereich mit angedeutetem Notensystem als Hintergrund */
+.hero {
+    position: relative;
+    padding: 54px 24px 46px;
+    background: linear-gradient(160deg, #f7f9ff 0%, #eef2ff 55%, #f5f3ff 100%);
+    border-bottom: 1px solid var(--rand);
+}
+.hero-staff {
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(to bottom,
+        transparent 0 17px, rgba(59, 91, 219, .5) 17px 18.5px);
+    background-position: 0 calc(50% - 34px);
+    background-size: 100% 92px;
+    background-repeat: no-repeat;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+}
+.hero h1 {
+    position: relative; margin: 0; font-size: 2.6rem; font-weight: 800;
+    letter-spacing: -.02em; color: #1b2559;
+    text-shadow: 0 0 18px #eef2ff, 0 0 34px #eef2ff, 0 0 8px #eef2ff;
+}
+.hero-sub {
+    position: relative; margin: 12px auto 0; max-width: 460px;
+    color: #5a6396; font-size: 1.02rem; line-height: 1.5;
+    text-shadow: 0 0 14px #eef2ff, 0 0 26px #eef2ff;
+}
 
 .menu-cards {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px; margin: 26px 0 6px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px; padding: 30px 28px 0;
 }
 .menu-card {
+    position: relative; overflow: hidden;
     background: var(--flaeche); color: var(--text);
     border: 1px solid var(--rand); border-radius: var(--radius);
-    padding: 22px 18px; text-align: left; cursor: pointer;
+    padding: 22px 20px 20px 24px; text-align: left; cursor: pointer;
     flex: none; min-width: 0; font-size: 1rem;
-    transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    display: flex; flex-direction: column;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+/* Farbiger Streifen links, der beim Überfahren aufgeht */
+.menu-card::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--modul, var(--akzent));
+    transition: width .18s ease;
 }
 .menu-card:hover {
-    background: var(--flaeche);
-    border-color: var(--akzent);
-    box-shadow: 0 6px 20px rgba(59, 91, 219, .12);
-    transform: translateY(-2px);
+    border-color: var(--modul, var(--akzent));
+    box-shadow: 0 10px 26px rgba(16, 24, 40, .10);
+    transform: translateY(-3px);
 }
-.menu-card .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; color: var(--akzent); }
-.menu-card .card-desc { font-size: .9rem; color: var(--text-leise); line-height: 1.45; font-weight: 400; }
+.menu-card:hover::before { width: 7px; }
+
+.card-num {
+    position: absolute; top: 12px; right: 16px;
+    font-size: 2.4rem; font-weight: 800; line-height: 1;
+    color: var(--modul, var(--akzent)); opacity: .13; letter-spacing: -.03em;
+}
+.card-title {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 7px;
+    color: var(--modul, var(--akzent));
+}
+.card-desc { font-size: .89rem; color: var(--text-leise); line-height: 1.5; font-weight: 400; }
+.card-meta {
+    margin-top: 14px; font-size: .74rem; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; color: #98a2b3;
+}
+
+/* Eigene Farbe je Modul */
+.menu-card[data-modul="noten"]       { --modul: #3b5bdb; }
+.menu-card[data-modul="vorzeichen"]  { --modul: #7c3aed; }
+.menu-card[data-modul="tonleitern"]  { --modul: #0d9488; }
+.menu-card[data-modul="intervalle"]  { --modul: #ea580c; }
+.menu-card[data-modul="dreiklaenge"] { --modul: #db2777; }
+
+/* Fünf Karten gehen in keinem Raster glatt auf. Bei drei Spalten wird das
+   Einstiegsmodul doppelt so breit, bei zwei Spalten das letzte — so bleibt
+   unten rechts keine Lücke. */
+@media (min-width: 620px) and (max-width: 939px) {
+    .menu-cards { grid-template-columns: repeat(2, 1fr); }
+    .menu-card:last-child { grid-column: span 2; }
+}
+@media (min-width: 940px) {
+    .menu-cards { grid-template-columns: repeat(3, 1fr); }
+    .menu-card:first-child { grid-column: span 2; }
+}
 
 /* ------------------------------------------------------- Aufgabenfläche */
 
@@ -229,6 +296,13 @@ button:disabled { background: #d0d5dd !important; cursor: not-allowed !important
     .container { padding: 20px 16px 24px; border-radius: 16px; }
     .module-header h2 { font-size: 1.25rem; }
     .header-spacer { width: 0; }
+    /* Der Kopfbereich der Startseite bleibt randlos */
+    .menu-page { padding: 0 0 24px; }
+    .hero { padding: 38px 18px 32px; }
+    .hero h1 { font-size: 2.1rem; }
+    .hero-sub { font-size: .95rem; }
+    .menu-cards { padding: 20px 16px 0; gap: 12px; }
+    .card-num { font-size: 2rem; top: 14px; right: 14px; }
 }
 
 /* Vorzeichen-Modul: 16 Notennamen in einem dichten Raster */

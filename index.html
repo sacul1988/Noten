@@ -10,29 +10,43 @@
 <body>
 
 <!-- ======================= STARTMENÜ ======================= -->
-<div id="main-menu" class="container">
-    <h1> Musik-Trainer</h1>
-    <p>Wähle ein Modul zum Üben:</p>
+<div id="main-menu" class="container menu-page">
+    <div class="hero">
+        <div class="hero-staff" aria-hidden="true"></div>
+        <h1>Musik&#8209;Trainer</h1>
+        <p class="hero-sub">Noten lesen, schreiben und verstehen — Schritt für Schritt</p>
+    </div>
+
     <div class="menu-cards">
-        <button class="menu-card" onclick="openModule('noten')">
-            <div class="card-title">Noten</div>
-            <div class="card-desc">Notennamen, Notenwerte, Platzieren &amp; Klaviatur</div>
+        <button class="menu-card" data-modul="noten" onclick="openModule('noten')">
+            <span class="card-num">01</span>
+            <span class="card-title">Noten</span>
+            <span class="card-desc">Notennamen und Notenwerte erkennen, Noten platzieren und auf der Klaviatur finden</span>
+            <span class="card-meta">9 Level</span>
         </button>
-        <button class="menu-card" onclick="openModule('vorzeichen')">
-            <div class="card-title">Vorzeichen</div>
-            <div class="card-desc">Noten mit Kreuz- und B-Vorzeichen erkennen &amp; spielen</div>
+        <button class="menu-card" data-modul="vorzeichen" onclick="openModule('vorzeichen')">
+            <span class="card-num">02</span>
+            <span class="card-title">Vorzeichen</span>
+            <span class="card-desc">Noten mit Kreuz und B benennen, setzen und auf der Klaviatur spielen</span>
+            <span class="card-meta">8 Level</span>
         </button>
-        <button class="menu-card" onclick="openModule('tonleitern')">
-            <div class="card-title">Tonleitern</div>
-            <div class="card-desc">Dur- und Moll-Tonleitern aufwärts aufbauen</div>
+        <button class="menu-card" data-modul="tonleitern" onclick="openModule('tonleitern')">
+            <span class="card-num">03</span>
+            <span class="card-title">Tonleitern</span>
+            <span class="card-desc">Dur- und Moll-Tonleitern aufwärts aufbauen, mit Ganz- und Halbtonschritten</span>
+            <span class="card-meta">8 Level</span>
         </button>
-        <button class="menu-card" onclick="openModule('intervalle')">
-            <div class="card-title">Intervalle</div>
-            <div class="card-desc">Abstände zwischen zwei Noten bestimmen &amp; bauen</div>
+        <button class="menu-card" data-modul="intervalle" onclick="openModule('intervalle')">
+            <span class="card-num">04</span>
+            <span class="card-title">Intervalle</span>
+            <span class="card-desc">Abstände zwischen zwei Noten bestimmen und selbst aufbauen</span>
+            <span class="card-meta">8 Level</span>
         </button>
-        <button class="menu-card" onclick="openModule('dreiklaenge')">
-            <div class="card-title">Dreiklänge</div>
-            <div class="card-desc">Dur- und Moll-Dreiklänge selbst schreiben</div>
+        <button class="menu-card" data-modul="dreiklaenge" onclick="openModule('dreiklaenge')">
+            <span class="card-num">05</span>
+            <span class="card-title">Dreiklänge</span>
+            <span class="card-desc">Dur- und Moll-Dreiklänge in Grundstellung schreiben und benennen</span>
+            <span class="card-meta">6 Level</span>
         </button>
     </div>
 </div>
