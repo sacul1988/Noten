@@ -60,6 +60,10 @@
     }
 
     const notesToPractice = ["c/4", "c#/4", "db/4", "d/4", "d#/4", "eb/4", "e/4", "f/4", "f#/4", "gb/4", "g/4", "g#/4", "ab/4", "a/4", "bb/4", "b/4", "c/5", "c#/5", "db/5", "d/5", "d#/5", "eb/5", "e/5", "f/5", "f#/5", "gb/5", "g/5", "g#/5", "ab/5", "a/5", "bb/5", "b/5", "c/6"];
+
+    /* Zieht ohne Zurücklegen, damit über ein Level hinweg jede Note
+       vorkommt, statt dass der Zufall manche häuft und andere auslässt. */
+    const notenBeutel = Core.createBag(notesToPractice);
     const naturalNotes = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5", "d/5", "e/5", "f/5", "g/5", "a/5", "b/5", "c/6"];
     const notesWithAccidentals = ["c#/4", "db/4", "d#/4", "eb/4", "f#/4", "gb/4", "g#/4", "ab/4", "bb/4", "c#/5", "db/5", "d#/5", "eb/5", "f#/5", "gb/5", "g#/5", "ab/5", "bb/5"];
 
@@ -243,18 +247,7 @@
             const rowConfirmBtn = $id("btn-confirm");
             if (rowConfirmBtn) rowConfirmBtn.style.display = "block";
 
-            let pool = [];
-            // Sicherstellen, dass > 50% Noten mit Vorzeichen sind
-            if (Math.random() < 0.6) {
-                pool = notesWithAccidentals.filter(n => !recentNotes.includes(n));
-            } else {
-                pool = naturalNotes.filter(n => !recentNotes.includes(n));
-            }
-            if (pool.length === 0) pool = notesToPractice;
-
-            targetNoteLetter = pool[Math.floor(Math.random() * pool.length)];
-            recentNotes.push(targetNoteLetter);
-            if (recentNotes.length > 3) recentNotes.shift();
+            targetNoteLetter = notenBeutel.next();
             lastNoteOctave = targetNoteLetter.split('/')[1];
 
             let noteLabel = targetNoteLetter.split('/')[0];
@@ -293,17 +286,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "flex";
 
-            let pool = [];
-            if (Math.random() < 0.6) {
-                pool = notesWithAccidentals.filter(n => !recentNotes.includes(n));
-            } else {
-                pool = naturalNotes.filter(n => !recentNotes.includes(n));
-            }
-            if (pool.length === 0) pool = notesToPractice;
-
-            const rawNote = pool[Math.floor(Math.random() * pool.length)];
-            recentNotes.push(rawNote);
-            if (recentNotes.length > 3) recentNotes.shift();
+            const rawNote = notenBeutel.next();
             const noteChar = rawNote.split('/')[0];
             targetNoteLetter = noteLogicNames[noteChar] || noteChar.toUpperCase();
 
@@ -328,17 +311,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "flex";
 
-            let pool = [];
-            if (Math.random() < 0.6) {
-                pool = notesWithAccidentals.filter(n => !recentNotes.includes(n));
-            } else {
-                pool = naturalNotes.filter(n => !recentNotes.includes(n));
-            }
-            if (pool.length === 0) pool = notesToPractice;
-
-            currentNoteKey = pool[Math.floor(Math.random() * pool.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             const noteChar = currentNoteKey.split('/')[0];
             targetNoteLetter = noteLogicNames[noteChar] || noteChar.toUpperCase();
 
@@ -362,17 +335,7 @@
             pianoNormal.style.display = "none";
             pianoLarge.style.display = "flex";
 
-            let pool = [];
-            if (Math.random() < 0.6) {
-                pool = notesWithAccidentals.filter(n => !recentNotes.includes(n));
-            } else {
-                pool = naturalNotes.filter(n => !recentNotes.includes(n));
-            }
-            if (pool.length === 0) pool = notesToPractice;
-
-            currentNoteKey = pool[Math.floor(Math.random() * pool.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
 
             $id("feedback").innerText = "Drücke die exakte Taste (auf die Oktave achten!)";
             $id("feedback").style.color = "#3b5bdb";
@@ -391,10 +354,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "none";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             currentNoteDuration = durations[Math.floor(Math.random() * durations.length)];
 
             $id("feedback").innerText = "Welcher Notenwert ist das?";
@@ -410,10 +370,7 @@
             pianoKeyboard.style.display = "none";
 
             const pool = [...notesWithAccidentals];
-            const filteredNotes = pool.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
 
             $id("feedback").innerText = "Bestimme die Note (inkl. Vorzeichen)";
             $id("feedback").style.color = "#000";
@@ -427,17 +384,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "none";
 
-            let pool = [];
-            if (Math.random() < 0.6) {
-                pool = notesWithAccidentals.filter(n => !recentNotes.includes(n));
-            } else {
-                pool = naturalNotes.filter(n => !recentNotes.includes(n));
-            }
-            if (pool.length === 0) pool = notesToPractice;
-
-            currentNoteKey = pool[Math.floor(Math.random() * pool.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             $id("feedback").innerText = "Welche Note ist das?";
             $id("feedback").style.color = "#000";
 
@@ -727,7 +674,10 @@
 
         let isCorrect = false;
         if (activeLv === 7) {
-            isCorrect = (guess === currentNoteKey);
+            // Ueber die Tonhoehe vergleichen, nicht ueber die Schreibweise:
+            // Des und Cis sind auf dem Klavier dieselbe Taste, und die Tasten
+            // tragen nur eine der beiden Bezeichnungen.
+            isCorrect = (Core.midi(guess) === Core.midi(currentNoteKey));
         } else {
             isCorrect = (guess === targetNoteLetter || enharmonics[guess] === targetNoteLetter);
         }
@@ -823,6 +773,7 @@
         score = 0;
         roundCount = 0;
         recentNotes = [];
+        notenBeutel.neu();
         $id("score").innerText = "0";
         nextRound();
     }

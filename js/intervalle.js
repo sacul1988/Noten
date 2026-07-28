@@ -24,7 +24,6 @@ const IntervallApp = (function () {
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
-    const recent = [];
     const STAFF_OPTS = { width: 440, scale: 1.7, staveWidth: 215, height: 180 };
 
     /* --------------------------------------------------------- Aufgabenwahl */
@@ -35,31 +34,28 @@ const IntervallApp = (function () {
     const BAU_ROOTS_VZ = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4",
                           "f#/4", "bb/4", "eb/4", "ab/4"];
 
-    /* Zwei Stammtöne, aufwärts, höchstens eine Oktave auseinander. */
-    function naturalPair(needQuality) {
-        for (let tries = 0; tries < 60; tries++) {
-            const i = Math.floor(Math.random() * (NATURALS.length - 1));
-            const offset = Core.pick([0, 1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7]);
-            const j = i + offset;
-            if (j >= NATURALS.length) continue;
-            const info = Core.intervalInfo(NATURALS[i], NATURALS[j]);
-            if (needQuality && !info.quality) continue;   // Tritonus überspringen
-            return { low: NATURALS[i], high: NATURALS[j], info: info };
-        }
-        return { low: "c/4", high: "e/4", info: Core.intervalInfo("c/4", "e/4") };
+    /* Sucht ein Tonpaar, das genau das vorgegebene Intervall bildet.
+       Ohne Vorzeichen müssen beide Töne Stammtöne sein. */
+    function pairFor(iv, mitVorzeichen) {
+        const roots = mitVorzeichen ? ROOTS_MIT_VORZEICHEN : NATURALS;
+        const kandidaten = [];
+        roots.forEach(function (low) {
+            const high = Core.noteAbove(low, iv.n, iv.s);
+            if (!Core.isUsable(high)) return;                       // z.B. Ces oder Heses
+            if (Core.midi(high) > Core.midi("c/6")) return;          // außerhalb der Klaviatur
+            if (!mitVorzeichen && Core.noteName(high).length > 1) return;
+            kandidaten.push({ low: low, high: high, info: Core.intervalInfo(low, high) });
+        });
+        return kandidaten.length ? Core.pick(kandidaten) : null;
     }
 
-    /* Grundton mit Vorzeichen plus ein Standardintervall darüber. */
-    function accidentalPair() {
-        for (let tries = 0; tries < 60; tries++) {
-            const low = Core.pick(ROOTS_MIT_VORZEICHEN);
-            const iv = Core.pick(STANDARD);
-            const high = Core.noteAbove(low, iv.n, iv.s);
-            if (!Core.isUsable(high)) continue;                    // z.B. Ces oder Heses
-            if (Core.midi(high) > Core.midi("c/6")) continue;      // außerhalb der Klaviatur
-            return { low: low, high: high, info: Core.intervalInfo(low, high) };
+    /* Zieht so lange aus dem Beutel, bis ein spielbares Paar entsteht. */
+    function naechstesPaar(beutel, mitVorzeichen) {
+        for (let i = 0; i < STANDARD.length; i++) {
+            const paar = pairFor(beutel.next(), mitVorzeichen);
+            if (paar) return paar;
         }
-        return { low: "c/4", high: "g/4", info: Core.intervalInfo("c/4", "g/4") };
+        return { low: "c/4", high: "e/4", info: Core.intervalInfo("c/4", "e/4") };
     }
 
     function drawPair(ctx, low, high, colors) {
@@ -70,7 +66,7 @@ const IntervallApp = (function () {
 
     /* Zwei Noten stehen da, das Intervall soll benannt werden. */
     function bestimmen(ctx, opts) {
-        const pair = opts.withAccidentals ? accidentalPair() : naturalPair(opts.quality);
+        const pair = naechstesPaar(opts.beutel, !!opts.withAccidentals);
         const answer = opts.quality ? pair.info.full : pair.info.name;
 
         ctx.task("Welches Intervall ist das?");
@@ -101,12 +97,22 @@ const IntervallApp = (function () {
 
     /* Ein Intervall ist genannt, der zweite Ton soll gesetzt werden. */
     function bauen(ctx, opts) {
-        let low, iv, target;
-        for (let tries = 0; tries < 60; tries++) {
-            low = Core.pickFresh(opts.withAccidentals ? BAU_ROOTS_VZ : BAU_ROOTS, recent, 2);
-            iv = Core.pick(STANDARD);
-            target = Core.noteAbove(low, iv.n, iv.s);
-            if (Core.isUsable(target) && Core.midi(target) <= Core.midi("c/6")) break;
+        const roots = opts.withAccidentals ? BAU_ROOTS_VZ : BAU_ROOTS;
+        let low = "c/4", target = "e/4";
+        for (let i = 0; i < STANDARD.length; i++) {
+            const iv = opts.beutel.next();
+            const kandidaten = [];
+            roots.forEach(function (r) {
+                const k = Core.noteAbove(r, iv.n, iv.s);
+                if (Core.isUsable(k) && Core.midi(k) <= Core.midi("c/6")) {
+                    kandidaten.push({ low: r, high: k });
+                }
+            });
+            if (kandidaten.length) {
+                const w = Core.pick(kandidaten);
+                low = w.low; target = w.high;
+                break;
+            }
         }
         const info = Core.intervalInfo(low, target);
 
@@ -145,8 +151,19 @@ const IntervallApp = (function () {
 
     /* -------------------------------------------------------------- Level */
 
+    /* Jedes Level zieht seine Intervalle ohne Zurücklegen, damit über die
+       Runden hinweg jedes einmal vorkommt. */
+    function neuerBeutel() {
+        return Core.createBag(STANDARD, function (iv) { return iv.n + "-" + iv.s; });
+    }
+
     function level(label, fn, opts) {
-        return { label: label, start: function (ctx) { fn(ctx, opts); } };
+        opts.beutel = neuerBeutel();
+        return {
+            label: label,
+            reset: function () { opts.beutel.neu(); },
+            start: function (ctx) { fn(ctx, opts); }
+        };
     }
 
     const levels = [
@@ -157,13 +174,17 @@ const IntervallApp = (function () {
         level("Mit Vorzeichen", bestimmen, { quality: true, keyboard: false, withAccidentals: true }),
         level("Intervall bauen, mit Klaviatur", bauen, { keyboard: true }),
         level("Intervall bauen in Noten", bauen, { keyboard: false }),
-        {
-            label: "Gemischt ohne Hilfen",
-            start: function (ctx) {
-                if (Math.random() < 0.5) bestimmen(ctx, { quality: true, keyboard: false, withAccidentals: true });
-                else bauen(ctx, { keyboard: false, withAccidentals: true });
-            }
-        }
+        (function () {
+            const opts = { quality: true, keyboard: false, withAccidentals: true, beutel: neuerBeutel() };
+            return {
+                label: "Gemischt ohne Hilfen",
+                reset: function () { opts.beutel.neu(); },
+                start: function (ctx) {
+                    if (Math.random() < 0.5) bestimmen(ctx, opts);
+                    else bauen(ctx, opts);
+                }
+            };
+        })()
     ];
 
     return Core.createModule({

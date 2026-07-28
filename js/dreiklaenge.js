@@ -14,7 +14,6 @@ const DreiklangApp = (function () {
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
-    const recent = [];
     const STAFF_OPTS = { width: 400, scale: 1.7, staveWidth: 175, height: 180, chord: true };
 
     const HINTS = {
@@ -33,8 +32,9 @@ const DreiklangApp = (function () {
     /* ------------------------------------------------------------ Bauen */
 
     function bauen(ctx, opts) {
-        const type = opts.types.length > 1 ? Core.pick(opts.types) : opts.types[0];
-        const root = Core.pickFresh(opts.roots[type], recent, 2, Core.german);
+        const aufgabe = opts.beutel.next();
+        const type = aufgabe.type;
+        const root = aufgabe.root;
         const triad = Core.buildTriad(root, type);
         let placed = 1;
 
@@ -93,9 +93,15 @@ const DreiklangApp = (function () {
 
     /* ---------------------------------------------------------- Benennen */
 
+    const benennBeutel = Core.createBag(
+        DUR_ALLE.map(function (r) { return { root: r, type: "dur" }; }).concat(
+        MOLL_ALLE.map(function (r) { return { root: r, type: "moll" }; })),
+        function (a) { return Core.german(a.root) + "-" + a.type; });
+
     function benennen(ctx) {
-        const type = Core.pick(["dur", "moll"]);
-        const root = Core.pickFresh(type === "dur" ? DUR_ALLE : MOLL_ALLE, recent, 2, Core.german);
+        const aufgabe = benennBeutel.next();
+        const type = aufgabe.type;
+        const root = aufgabe.root;
         const triad = Core.buildTriad(root, type);
 
         drawChord(ctx, triad);
@@ -134,8 +140,21 @@ const DreiklangApp = (function () {
 
     /* -------------------------------------------------------------- Level */
 
+    /* Alle Akkorde eines Levels liegen in einem Beutel und werden ohne
+       Zurücklegen gezogen, damit jeder einmal drankommt. */
     function bauLevel(label, opts) {
-        return { label: label, start: function (ctx) { bauen(ctx, opts); } };
+        const aufgaben = [];
+        opts.types.forEach(function (t) {
+            opts.roots[t].forEach(function (r) { aufgaben.push({ root: r, type: t }); });
+        });
+        opts.beutel = Core.createBag(aufgaben, function (a) {
+            return Core.german(a.root) + "-" + a.type;
+        });
+        return {
+            label: label,
+            reset: function () { opts.beutel.neu(); },
+            start: function (ctx) { bauen(ctx, opts); }
+        };
     }
 
     const levels = [
@@ -152,7 +171,7 @@ const DreiklangApp = (function () {
         bauLevel("In Noten schreiben", {
             types: ["dur", "moll"], roots: { dur: DUR_ALLE, moll: MOLL_ALLE },
             keyboard: false, hint: false }),
-        { label: "Dreiklänge benennen", start: benennen }
+        { label: "Dreiklänge benennen", reset: function () { benennBeutel.neu(); }, start: benennen }
     ];
 
     return Core.createModule({

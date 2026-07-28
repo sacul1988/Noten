@@ -14,8 +14,6 @@ const TonleiterApp = (function () {
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
-    const recent = [];
-
     // Laufender Zustand der aktuellen Aufgabe
     let scale = [];        // Soll-Tonleiter
     let placed = 0;        // wie viele Töne bereits richtig gesetzt sind
@@ -44,13 +42,25 @@ const TonleiterApp = (function () {
         ctx.staff(shown, { width: 880, scale: 1.3, staveWidth: 640, height: 140 });
     }
 
-    /* Ein Level-Durchgang. */
+    /* Ein Level-Durchgang. Die Tonarten liegen in einem Beutel, aus dem ohne
+       Zurücklegen gezogen wird — so kommt jede einmal dran, bevor sich eine
+       wiederholt. */
     function makeLevel(opts) {
+        const aufgaben = [];
+        opts.types.forEach(function (t) {
+            opts.roots[t].forEach(function (r) { aufgaben.push({ root: r, type: t }); });
+        });
+        const beutel = Core.createBag(aufgaben, function (a) {
+            return Core.german(a.root) + "-" + a.type;
+        });
+
         return {
             label: opts.label,
+            reset: function () { beutel.neu(); },
             start: function (ctx) {
-                type = opts.types.length > 1 ? Core.pick(opts.types) : opts.types[0];
-                const root = Core.pickFresh(opts.roots[type], recent, 2, Core.german);
+                const aufgabe = beutel.next();
+                type = aufgabe.type;
+                const root = aufgabe.root;
                 scale = Core.buildScale(root, type);
                 placed = 1;
 

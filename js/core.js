@@ -512,6 +512,8 @@ const Core = (function () {
         function setLevel(index) {
             if (index > maxUnlocked) { el.lock.style.display = "flex"; return; }
             levelIndex = index;
+            // Aufgabenbeutel des Levels frisch fuellen
+            if (typeof levels[index].reset === "function") levels[index].reset();
             score = 0;
             roundCount = 0;
             el.score.innerText = "0";
@@ -617,6 +619,56 @@ const Core = (function () {
 
     function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
+    function mischen(list) {
+        const a = list.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+
+    /* Zieht ohne Zurücklegen: erst wenn jeder Eintrag einmal an der Reihe war,
+       wird neu gemischt. Reiner Zufall würde in einem Level manche Tonarten
+       mehrfach bringen und andere gar nicht.
+       merkmal bestimmt, was als gleiche Aufgabe gilt (etwa der Notenname
+       unabhängig von der Oktave). */
+    function createBag(list, merkmal) {
+        const kennung = merkmal || function (x) { return x; };
+
+        // Einträge gleicher Kennung bilden eine Gruppe. Gezogen wird die
+        // Gruppe; welcher Vertreter daraus kommt (etwa dieselbe Tonart in
+        // einer anderen Oktave), entscheidet der Zufall.
+        const gruppen = {};
+        const schluessel = [];
+        list.forEach(function (x) {
+            const k = kennung(x);
+            if (!gruppen[k]) { gruppen[k] = []; schluessel.push(k); }
+            gruppen[k].push(x);
+        });
+
+        let rest = [];
+        let zuletzt = null;
+
+        function nachfuellen() {
+            rest = mischen(schluessel);
+            // Kein direkter Anschluss an die zuletzt gezogene Gruppe
+            if (zuletzt !== null && rest.length > 1 && rest[0] === zuletzt) {
+                rest.push(rest.shift());
+            }
+        }
+
+        return {
+            next: function () {
+                if (!rest.length) nachfuellen();
+                const k = rest.shift();
+                zuletzt = k;
+                return pick(gruppen[k]);
+            },
+            neu: function () { rest = []; zuletzt = null; }
+        };
+    }
+
     /* Wählt aus list und vermeidet dabei die zuletzt gezogenen Einträge.
        Bei kurzen Listen wird weniger gesperrt, sonst bliebe rechnerisch nur
        noch ein Kandidat übrig und die Reihenfolge wäre vorhersehbar.
@@ -657,6 +709,7 @@ const Core = (function () {
         whenVexReady: whenVexReady,
         createModule: createModule,
         pick: pick,
-        pickFresh: pickFresh
+        pickFresh: pickFresh,
+        createBag: createBag
     };
 })();

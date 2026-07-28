@@ -60,6 +60,10 @@
 
     const notesToPractice = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5", "d/5", "e/5", "f/5", "g/5", "a/5", "b/5", "c/6"];
 
+    /* Zieht ohne Zurücklegen, damit über ein Level hinweg jede Note
+       vorkommt, statt dass der Zufall manche häuft und andere auslässt. */
+    const notenBeutel = Core.createBag(notesToPractice);
+
     function moveNote(dir) {
         if (roundDone) return;
         let activeLv = currentLevel;
@@ -200,14 +204,9 @@
             const rowConfirmBtn = $id("btn-confirm");
             if (rowConfirmBtn) rowConfirmBtn.style.display = "block";
 
-            let filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            if (lastNoteOctave !== "") {
-                const alternateNotes = filteredNotes.filter(n => n.split('/')[1] !== lastNoteOctave);
-                if (alternateNotes.length > 0) filteredNotes = alternateNotes;
-            }
-            targetNoteLetter = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(targetNoteLetter);
-            if (recentNotes.length > 3) recentNotes.shift();
+            // Der Beutel verteilt ohnehin gleichmaessig ueber beide Oktaven,
+            // die fruehere Sonderregel fuer den Oktavwechsel entfaellt damit.
+            targetNoteLetter = notenBeutel.next();
             lastNoteOctave = targetNoteLetter.split('/')[1];
 
             let noteLabel = targetNoteLetter.split('/')[0];
@@ -240,10 +239,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "flex";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            const rawNote = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(rawNote);
-            if (recentNotes.length > 3) recentNotes.shift();
+            const rawNote = notenBeutel.next();
             const noteChar = rawNote.split('/')[0];
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
@@ -265,10 +261,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "flex";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             const noteChar = currentNoteKey.split('/')[0];
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
@@ -292,10 +285,7 @@
             pianoNormal.style.display = "none";
             pianoLarge.style.display = "flex";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
 
             taskInstr.innerText = "Drücke die exakte Taste (auf die Oktave achten!)";
             taskInstr.style.color = "#3b5bdb";
@@ -314,10 +304,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "none";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             currentNoteDuration = durations[Math.floor(Math.random() * durations.length)];
 
             taskInstr.innerText = "Welcher Notenwert ist das?";
@@ -332,10 +319,7 @@
             if (pianoLarge) pianoLarge.style.display = "none";
             pianoKeyboard.style.display = "none";
 
-            const filteredNotes = notesToPractice.filter(n => !recentNotes.includes(n));
-            currentNoteKey = filteredNotes[Math.floor(Math.random() * filteredNotes.length)];
-            recentNotes.push(currentNoteKey);
-            if (recentNotes.length > 3) recentNotes.shift();
+            currentNoteKey = notenBeutel.next();
             taskInstr.innerText = "Welche Note ist das?";
             taskInstr.style.color = "#333";
 
@@ -705,6 +689,7 @@
         score = 0;
         roundCount = 0;
         recentNotes = [];
+        notenBeutel.neu();
         $id("score").innerText = "0";
         nextRound();
     }
