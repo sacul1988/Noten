@@ -80,7 +80,7 @@ const IntervallApp = (function () {
             ctx.keyboard("c/4", "c/6", null);
             [pair.low, pair.high].forEach(function (k) {
                 const e = ctx.keyEl(Core.midi(k));
-                if (e) e.style.background = "#4a90e2";
+                if (e) ctx.paintKey(e, "#3b5bdb");
             });
             ctx.hint("Zähle auf der Klaviatur die Halbtonschritte zwischen den beiden Tönen.");
         } else {
@@ -89,8 +89,9 @@ const IntervallApp = (function () {
 
         ctx.answers(opts.quality ? FULL_BUTTONS : NUMBER_BUTTONS, function (choice) {
             if (choice === answer) {
-                drawPair(ctx, pair.low, pair.high, ["#2ecc71", "#2ecc71"]);
-                ctx.solved(Core.german(pair.low) + " – " + Core.german(pair.high) + " = " + pair.info.full + " 🌟");
+                drawPair(ctx, pair.low, pair.high, ["#12b76a", "#12b76a"]);
+                ctx.solved(Core.german(pair.low) + " – " + Core.german(pair.high) +
+                           " = " + pair.info.full);
             } else {
                 ctx.failed("Das stimmt noch nicht. " + Core.german(pair.low) +
                            " und " + Core.german(pair.high) + " genau anschauen!");
@@ -113,20 +114,19 @@ const IntervallApp = (function () {
         ctx.staff([low], STAFF_OPTS);
 
         function success() {
-            ctx.staff([low, target], Object.assign({ colors: ["black", "#2ecc71"] }, STAFF_OPTS));
-            ctx.keyboard(false);
-            ctx.clearAnswers();
-            ctx.solved("Richtig: " + Core.german(target) + " 🌟");
+            ctx.staff([low, target], Object.assign({ colors: ["black", "#12b76a"] }, STAFF_OPTS));
+            ctx.solved("Richtig: " + Core.german(low) + " – " + Core.german(target) +
+                       " ist eine " + info.full + ".");
         }
 
         if (opts.keyboard) {
             ctx.clearAnswers();
             ctx.keyboard("c/4", "c/6", function (m, keyEl) {
                 if (m === Core.midi(target)) {
-                    keyEl.style.background = "#2ecc71";
+                    ctx.paintKey(keyEl, "#12b76a");
                     success();
                 } else {
-                    keyEl.style.background = "#e74c3c";
+                    ctx.paintKey(keyEl, "#e5484d");
                     ctx.failed("Noch nicht richtig — zähle die Halbtonschritte ab " + Core.german(low) + ".");
                     setTimeout(function () { ctx.resetKeys(); }, 900);
                 }

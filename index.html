@@ -11,31 +11,26 @@
 
 <!-- ======================= STARTMENÜ ======================= -->
 <div id="main-menu" class="container">
-    <h1>🎼 Musik-Trainer</h1>
-    <p style="color: #666;">Wähle ein Modul zum Üben:</p>
+    <h1> Musik-Trainer</h1>
+    <p>Wähle ein Modul zum Üben:</p>
     <div class="menu-cards">
         <button class="menu-card" onclick="openModule('noten')">
-            <div class="card-icon">🎵</div>
             <div class="card-title">Noten</div>
             <div class="card-desc">Notennamen, Notenwerte, Platzieren &amp; Klaviatur</div>
         </button>
         <button class="menu-card" onclick="openModule('vorzeichen')">
-            <div class="card-icon">♯♭</div>
             <div class="card-title">Vorzeichen</div>
             <div class="card-desc">Noten mit Kreuz- und B-Vorzeichen erkennen &amp; spielen</div>
         </button>
         <button class="menu-card" onclick="openModule('tonleitern')">
-            <div class="card-icon">🪜</div>
             <div class="card-title">Tonleitern</div>
             <div class="card-desc">Dur- und Moll-Tonleitern aufwärts aufbauen</div>
         </button>
         <button class="menu-card" onclick="openModule('intervalle')">
-            <div class="card-icon">📐</div>
             <div class="card-title">Intervalle</div>
             <div class="card-desc">Abstände zwischen zwei Noten bestimmen &amp; bauen</div>
         </button>
         <button class="menu-card" onclick="openModule('dreiklaenge')">
-            <div class="card-icon">🎹</div>
             <div class="card-title">Dreiklänge</div>
             <div class="card-desc">Dur- und Moll-Dreiklänge selbst schreiben</div>
         </button>
@@ -57,8 +52,7 @@
 
     <div id="n-lockModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: #e74c3c;">Level gesperrt! 🔒</h3>
-            <div style="font-size: 4rem; margin: 1rem 0;">🚫</div>
+            <h3 style="color: #e5484d;">Level gesperrt!</h3>
             <div class="result-stats">Noch nicht freigeschaltet</div>
             <div style="margin-bottom: 1.5rem;">Du musst erst das vorherige Level mit mindestens <b>Note 3</b> bestehen, um hier fortzufahren.</div>
             <button class="modal-btn" onclick="document.getElementById('n-lockModal').style.display='none'">Verstanden</button>
@@ -67,24 +61,24 @@
 
     <div id="n-unlockModal" class="modal">
         <div class="modal-content">
-            <h3 id="n-unlockTitle" style="color: #f1c40f;">Freischaltung 🔑</h3>
-            <div id="n-unlockIcon" style="font-size: 3rem; margin: 0.5rem 0;">👨‍🏫</div>
+            <h3 id="n-unlockTitle" style="color: #eab308;">Freischaltung</h3>
+            <div id="n-unlockIcon"></div>
             <p id="n-unlockText">Gib das Passwort ein:</p>
             <div id="n-passwordContainer">
                 <input type="password" id="n-unlockPassword" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') NotenApp.checkUnlockPassword()">
             </div>
             <div id="n-unlockActionBtns" style="display: flex; gap: 10px;">
-                <button id="n-unlockCancelBtn" class="modal-btn" style="background: #95a5a6;" onclick="document.getElementById('n-unlockModal').style.display='none'">Abbrechen</button>
-                <button id="n-unlockOkBtn" class="modal-btn" style="background: #f1c40f; color: #000;" onclick="NotenApp.checkUnlockPassword()">OK</button>
+                <button id="n-unlockCancelBtn" class="modal-btn" style="background: #98a2b3;" onclick="document.getElementById('n-unlockModal').style.display='none'">Abbrechen</button>
+                <button id="n-unlockOkBtn" class="modal-btn" style="background: #eab308; color: #000;" onclick="NotenApp.checkUnlockPassword()">OK</button>
             </div>
-            <button id="n-unlockCloseBtn" class="modal-btn" style="background: #4a90e2; display: none;" onclick="document.getElementById('n-unlockModal').style.display='none'">Verstanden</button>
+            <button id="n-unlockCloseBtn" class="modal-btn" style="background: #3b5bdb; display: none;" onclick="document.getElementById('n-unlockModal').style.display='none'">Verstanden</button>
         </div>
     </div>
 
     <div class="module-header">
-        <button class="menu-btn" onclick="backToMenu()">🏠 Menü</button>
+        <button class="menu-btn" onclick="backToMenu()">Menü</button>
         <h2>Noten</h2>
-        <div style="width: 78px;"></div>
+        <div class="header-spacer"></div>
     </div>
     <div class="score-board">
         Richtig: <span id="n-score">0</span>
@@ -98,12 +92,12 @@
             <button id="n-btn-lvl7" onclick="NotenApp.setLevel(7)">Level 7</button>
             <button id="n-btn-lvl8" onclick="NotenApp.setLevel(8)">Level 8</button>
             <button id="n-btn-lvl9" onclick="NotenApp.setLevel(9)">Level 9</button>
-            <button onclick="NotenApp.unlockAllLevels()" style="background: #f1c40f; color: #000; padding: 5px 12px; font-size: 1rem; border-radius: 8px;" title="Alle Level freischalten">🔓</button>
-            <button id="n-btn-cancel" onclick="NotenApp.cancelLevel()" style="background: #e74c3c; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
+            <button onclick="NotenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
+            <button id="n-btn-cancel" onclick="NotenApp.cancelLevel()" style="background: #e5484d; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
         </div>
     </div>
 
-    <div id="n-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e74c3c; margin-bottom: 10px; display: none;">Zeit: 20s</div>
+    <div id="n-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e5484d; margin-bottom: 10px; display: none;">Zeit: 20s</div>
     <div id="n-output" class="note-output"></div>
     <div id="n-error-display" style="color: red; font-size: 0.8rem; margin: 5px; display: none;">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
 
@@ -128,12 +122,14 @@
         <button onclick="NotenApp.checkDuration('16')">16.tel</button>
     </div>
     <div id="n-placement-buttons" class="btn-grid" style="display: none;">
-        <button onclick="NotenApp.moveNote(-1)" style="background: #e67e22;">↓ Tiefer</button>
-        <button id="n-btn-confirm" onclick="NotenApp.confirmPlacement()" style="background: #4a90e2; display: none;">Bestätigen</button>
-        <button onclick="NotenApp.moveNote(1)" style="background: #27ae60;">↑ Höher</button>
+        <button onclick="NotenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
+        <button id="n-btn-confirm" onclick="NotenApp.confirmPlacement()" style="background: #3b5bdb; display: none;">Bestätigen</button>
+        <button onclick="NotenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
     </div>
     <div id="n-octave-buttons" class="btn-grid" style="display: none;">
     </div>
+
+    <div id="n-continue" class="continue-box"></div>
 
     <!-- Keyboard for Level 5 -->
     <div id="n-piano-keyboard" class="piano-container" style="display: none;">
@@ -201,8 +197,7 @@
 
     <div id="v-lockModal" class="modal">
         <div class="modal-content">
-            <h3 style="color: #e74c3c;">Level gesperrt! 🔒</h3>
-            <div style="font-size: 4rem; margin: 1rem 0;">🚫</div>
+            <h3 style="color: #e5484d;">Level gesperrt!</h3>
             <div class="result-stats">Noch nicht freigeschaltet</div>
             <div style="margin-bottom: 1.5rem;">Du musst erst das vorherige Level mit mindestens <b>Note 3</b> bestehen, um hier fortzufahren.</div>
             <button class="modal-btn" onclick="document.getElementById('v-lockModal').style.display='none'">Verstanden</button>
@@ -211,24 +206,24 @@
 
     <div id="v-unlockModal" class="modal">
         <div class="modal-content">
-            <h3 id="v-unlockTitle" style="color: #f1c40f;">Freischaltung 🔑</h3>
-            <div id="v-unlockIcon" style="font-size: 3rem; margin: 0.5rem 0;">👨‍🏫</div>
+            <h3 id="v-unlockTitle" style="color: #eab308;">Freischaltung</h3>
+            <div id="v-unlockIcon"></div>
             <p id="v-unlockText">Gib das Passwort ein:</p>
             <div id="v-passwordContainer">
                 <input type="password" id="v-unlockPassword" style="width: 80%; padding: 12px; margin-bottom: 1.5rem; border: 2px solid #eee; border-radius: 10px; font-size: 1.1rem; text-align: center;" onkeyup="if(event.key==='Enter') VorzeichenApp.checkUnlockPassword()">
             </div>
             <div id="v-unlockActionBtns" style="display: flex; gap: 10px;">
-                <button id="v-unlockCancelBtn" class="modal-btn" style="background: #95a5a6;" onclick="document.getElementById('v-unlockModal').style.display='none'">Abbrechen</button>
-                <button id="v-unlockOkBtn" class="modal-btn" style="background: #f1c40f; color: #000;" onclick="VorzeichenApp.checkUnlockPassword()">OK</button>
+                <button id="v-unlockCancelBtn" class="modal-btn" style="background: #98a2b3;" onclick="document.getElementById('v-unlockModal').style.display='none'">Abbrechen</button>
+                <button id="v-unlockOkBtn" class="modal-btn" style="background: #eab308; color: #000;" onclick="VorzeichenApp.checkUnlockPassword()">OK</button>
             </div>
-            <button id="v-unlockCloseBtn" class="modal-btn" style="background: #4a90e2; display: none;" onclick="document.getElementById('v-unlockModal').style.display='none'">Verstanden</button>
+            <button id="v-unlockCloseBtn" class="modal-btn" style="background: #3b5bdb; display: none;" onclick="document.getElementById('v-unlockModal').style.display='none'">Verstanden</button>
         </div>
     </div>
 
     <div class="module-header">
-        <button class="menu-btn" onclick="backToMenu()">🏠 Menü</button>
+        <button class="menu-btn" onclick="backToMenu()">Menü</button>
         <h2>Vorzeichen</h2>
-        <div style="width: 78px;"></div>
+        <div class="header-spacer"></div>
     </div>
     <div class="score-board">
         Richtig: <span id="v-score">0</span>
@@ -241,12 +236,12 @@
             <button id="v-btn-lvl7" onclick="VorzeichenApp.setLevel(7)">Level 6</button>
             <button id="v-btn-lvl8" onclick="VorzeichenApp.setLevel(8)">Level 7</button>
             <button id="v-btn-lvl9" onclick="VorzeichenApp.setLevel(9)">Level 8</button>
-            <button onclick="VorzeichenApp.unlockAllLevels()" style="background: #f1c40f; color: #000; padding: 5px 12px; font-size: 1rem; border-radius: 8px;" title="Alle Level freischalten">🔓</button>
-            <button id="v-btn-cancel" onclick="VorzeichenApp.cancelLevel()" style="background: #e74c3c; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
+            <button onclick="VorzeichenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
+            <button id="v-btn-cancel" onclick="VorzeichenApp.cancelLevel()" style="background: #e5484d; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
         </div>
     </div>
 
-    <div id="v-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e74c3c; margin-bottom: 10px; display: none;">Zeit: 20s</div>
+    <div id="v-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e5484d; margin-bottom: 10px; display: none;">Zeit: 20s</div>
     <div id="v-output" class="note-output"></div>
     <div id="v-error-display" style="color: red; font-size: 0.8rem; margin: 5px; display: none;">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
 
@@ -255,23 +250,23 @@
 
     <div id="v-input-buttons" class="btn-grid">
         <div style="width: 100%; display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; justify-content: center;">
-            <button onclick="VorzeichenApp.checkAnswer('C')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">C</button>
-            <button onclick="VorzeichenApp.checkAnswer('C#')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Cis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Db')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Des</button>
-            <button onclick="VorzeichenApp.checkAnswer('D')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">D</button>
-            <button onclick="VorzeichenApp.checkAnswer('D#')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Dis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Eb')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Es</button>
-            <button onclick="VorzeichenApp.checkAnswer('E')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">E</button>
-            <button onclick="VorzeichenApp.checkAnswer('F')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">F</button>
+            <button onclick="VorzeichenApp.checkAnswer('C')" class="answer-btn dense-btn">C</button>
+            <button onclick="VorzeichenApp.checkAnswer('C#')" class="answer-btn dense-btn">Cis</button>
+            <button onclick="VorzeichenApp.checkAnswer('Db')" class="answer-btn dense-btn">Des</button>
+            <button onclick="VorzeichenApp.checkAnswer('D')" class="answer-btn dense-btn">D</button>
+            <button onclick="VorzeichenApp.checkAnswer('D#')" class="answer-btn dense-btn">Dis</button>
+            <button onclick="VorzeichenApp.checkAnswer('Eb')" class="answer-btn dense-btn">Es</button>
+            <button onclick="VorzeichenApp.checkAnswer('E')" class="answer-btn dense-btn">E</button>
+            <button onclick="VorzeichenApp.checkAnswer('F')" class="answer-btn dense-btn">F</button>
 
-            <button onclick="VorzeichenApp.checkAnswer('F#')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Fis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Gb')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Ges</button>
-            <button onclick="VorzeichenApp.checkAnswer('G')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">G</button>
-            <button onclick="VorzeichenApp.checkAnswer('G#')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">Gis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Ab')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">As</button>
-            <button onclick="VorzeichenApp.checkAnswer('A')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">A</button>
-            <button onclick="VorzeichenApp.checkAnswer('B')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">B</button>
-            <button onclick="VorzeichenApp.checkAnswer('H')" style="padding: 12px 2px; font-size: 1rem; background: #4a90e2;">H</button>
+            <button onclick="VorzeichenApp.checkAnswer('F#')" class="answer-btn dense-btn">Fis</button>
+            <button onclick="VorzeichenApp.checkAnswer('Gb')" class="answer-btn dense-btn">Ges</button>
+            <button onclick="VorzeichenApp.checkAnswer('G')" class="answer-btn dense-btn">G</button>
+            <button onclick="VorzeichenApp.checkAnswer('G#')" class="answer-btn dense-btn">Gis</button>
+            <button onclick="VorzeichenApp.checkAnswer('Ab')" class="answer-btn dense-btn">As</button>
+            <button onclick="VorzeichenApp.checkAnswer('A')" class="answer-btn dense-btn">A</button>
+            <button onclick="VorzeichenApp.checkAnswer('B')" class="answer-btn dense-btn">B</button>
+            <button onclick="VorzeichenApp.checkAnswer('H')" class="answer-btn dense-btn">H</button>
         </div>
     </div>
     <div id="v-duration-buttons" class="btn-grid" style="display: none;">
@@ -283,15 +278,17 @@
     </div>
     <div id="v-placement-buttons" class="btn-grid" style="display: none;">
         <div style="width: 100%; display: flex; gap: 8px; justify-content: center; margin-bottom: 5px;">
-            <button id="v-btn-acc-sharp" onclick="VorzeichenApp.setAccidental('#')" style="background: #7f8c8d; flex: none; width: 60px;">#</button>
-            <button id="v-btn-acc-flat" onclick="VorzeichenApp.setAccidental('b')" style="background: #7f8c8d; flex: none; width: 60px;">b</button>
+            <button id="v-btn-acc-sharp" onclick="VorzeichenApp.setAccidental('#')" style="background: #667085; flex: none; width: 60px;">#</button>
+            <button id="v-btn-acc-flat" onclick="VorzeichenApp.setAccidental('b')" style="background: #667085; flex: none; width: 60px;">b</button>
         </div>
-        <button onclick="VorzeichenApp.moveNote(-1)" style="background: #e67e22;">↓ Tiefer</button>
-        <button id="v-btn-confirm" onclick="VorzeichenApp.confirmPlacement()" style="background: #4a90e2; display: none;">Bestätigen</button>
-        <button onclick="VorzeichenApp.moveNote(1)" style="background: #27ae60;">↑ Höher</button>
+        <button onclick="VorzeichenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
+        <button id="v-btn-confirm" onclick="VorzeichenApp.confirmPlacement()" style="background: #3b5bdb; display: none;">Bestätigen</button>
+        <button onclick="VorzeichenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
     </div>
     <div id="v-octave-buttons" class="btn-grid" style="display: none;">
     </div>
+
+    <div id="v-continue" class="continue-box"></div>
 
     <!-- Keyboard for Level 5 -->
     <div id="v-piano-keyboard" class="piano-container" style="display: none;">

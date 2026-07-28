@@ -43,13 +43,11 @@ const DreiklangApp = (function () {
             placed++;
             drawChord(ctx, triad.slice(0, placed));
             if (placed >= triad.length) {
-                ctx.keyboard(false);
-                ctx.clearAnswers();
-                drawChord(ctx, triad, ["#2ecc71", "#2ecc71", "#2ecc71"]);
+                drawChord(ctx, triad, ["#12b76a", "#12b76a", "#12b76a"]);
                 ctx.solved(chordName(root, type) + " = " +
-                           triad.map(Core.german).join(" – ") + " 🌟");
+                           triad.map(Core.german).join(" – "));
             } else {
-                ctx.feedback("Richtig — jetzt noch die Quinte.", "#2ecc71");
+                ctx.feedback("Richtig — jetzt noch die Quinte.", "#12b76a");
             }
         }
 
@@ -57,7 +55,7 @@ const DreiklangApp = (function () {
             ctx.resetKeys();
             for (let i = 0; i < placed; i++) {
                 const k = ctx.keyEl(Core.midi(triad[i]));
-                if (k) k.style.background = "#2ecc71";
+                if (k) ctx.paintKey(k, "#12b76a");
             }
         }
 
@@ -66,10 +64,10 @@ const DreiklangApp = (function () {
             ctx.keyboard("c/4", "c/6", function (m, keyEl) {
                 if (placed >= triad.length) return;
                 if (m === Core.midi(triad[placed])) {
-                    keyEl.style.background = "#2ecc71";
+                    ctx.paintKey(keyEl, "#12b76a");
                     accept();
                 } else {
-                    keyEl.style.background = "#e74c3c";
+                    ctx.paintKey(keyEl, "#e5484d");
                     ctx.failed(placed === 1
                         ? "Das ist nicht die richtige Terz."
                         : "Das ist nicht die richtige Quinte.");
@@ -106,7 +104,7 @@ const DreiklangApp = (function () {
             ctx.task("Welcher Ton ist der Grundton dieses Dreiklangs?");
             ctx.answers(NOTE_BUTTONS, function (name) {
                 if (name === Core.german(root)) {
-                    ctx.feedback("Grundton stimmt! 👍", "#2ecc71");
+                    ctx.feedback("Grundton stimmt!", "#12b76a");
                     askType();
                 } else {
                     ctx.failed("Der Grundton ist die unterste Note — schau noch einmal hin.");
@@ -117,13 +115,13 @@ const DreiklangApp = (function () {
         function askType() {
             ctx.task("Ist das ein Dur- oder ein Moll-Dreiklang?");
             ctx.answers([
-                { label: "Dur",  value: "dur",  color: "#e67e22" },
-                { label: "Moll", value: "moll", color: "#8e44ad" }
+                { label: "Dur",  value: "dur",  color: "#f97316" },
+                { label: "Moll", value: "moll", color: "#7c3aed" }
             ], function (choice) {
                 if (choice === type) {
-                    drawChord(ctx, triad, ["#2ecc71", "#2ecc71", "#2ecc71"]);
-                    ctx.clearAnswers();
-                    ctx.solved("Das ist ein " + chordName(root, type) + "-Dreiklang! 🌟");
+                    drawChord(ctx, triad, ["#12b76a", "#12b76a", "#12b76a"]);
+                    ctx.solved("Richtig: " + chordName(root, type) + "-Dreiklang aus " +
+                               triad.map(Core.german).join(" – "));
                 } else {
                     ctx.failed("Nicht ganz — entscheidend ist die untere Terz: 4 Halbtöne bedeuten Dur, 3 bedeuten Moll.");
                 }

@@ -10,6 +10,7 @@
     let currentNoteIndex = 7;
     let isNoteLocked = false;
     let isCurrentRoundFailed = false;
+    let roundDone = false;   // geloest, wartet auf "Weiter"
     let score = 0;
     let roundCount = 0;
     let currentLevel = 4;
@@ -41,8 +42,8 @@
                 if (display) display.style.display = "none";
                 const feedback = $id("feedback");
                 if (feedback) {
-                    feedback.innerText = "Zeit abgelaufen! ⏱️";
-                    feedback.style.color = "#e74c3c";
+                    feedback.innerText = "Zeit abgelaufen! ⏱";
+                    feedback.style.color = "#e5484d";
                 }
                 setTimeout(() => {
                     setLevel(currentLevel);
@@ -60,6 +61,7 @@
     const notesToPractice = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5", "d/5", "e/5", "f/5", "g/5", "a/5", "b/5", "c/6"];
 
     function moveNote(dir) {
+        if (roundDone) return;
         let activeLv = currentLevel;
         if (currentLevel === 8 || currentLevel === 9) {
             const levels = [4, 1, 2, 3, 5, 6, 7];
@@ -147,6 +149,9 @@
     }
 
     function nextRound() {
+        roundDone = false;
+        const contBox = $id("continue");
+        if (contBox) { contBox.style.display = "none"; contBox.innerHTML = ""; }
         if (roundCount >= totalRoundsForCurrentLevel) {
             stopTimer();
             showFinalResult();
@@ -220,7 +225,7 @@
             }
 
             taskInstr.innerText = `Platziere: ${displayTarget}`;
-            taskInstr.style.color = "#4a90e2";
+            taskInstr.style.color = "#3b5bdb";
 
             currentNoteIndex = 7;
             placedNoteKey = notesToPractice[currentNoteIndex];
@@ -243,11 +248,11 @@
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
             taskInstr.innerText = `Suche die Taste für: ${targetNoteLetter}`;
-            taskInstr.style.color = "#4a90e2";
+            taskInstr.style.color = "#3b5bdb";
 
             // Tastenfarbe zurücksetzen
             const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = k.classList.contains('black') ? '#333' : 'white'; });
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
 
             drawNote(null); // Kein Notensystem nötig oder leer? Lass es leer.
         } else if (activeLevel === 6) {
@@ -268,11 +273,11 @@
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
             taskInstr.innerText = "Drücke die entsprechende Taste";
-            taskInstr.style.color = "#4a90e2";
+            taskInstr.style.color = "#3b5bdb";
 
             // Tastenfarbe zurücksetzen
             const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = k.classList.contains('black') ? '#333' : 'white'; });
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
 
             drawNote(currentNoteKey, "q");
         } else if (activeLevel === 7) {
@@ -293,11 +298,11 @@
             if (recentNotes.length > 3) recentNotes.shift();
 
             taskInstr.innerText = "Drücke die exakte Taste (auf die Oktave achten!)";
-            taskInstr.style.color = "#4a90e2";
+            taskInstr.style.color = "#3b5bdb";
 
             // Tastenfarbe zurücksetzen (alle Klaviaturen)
             const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = k.classList.contains('black') ? '#333' : 'white'; });
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
 
             drawNote(currentNoteKey, "q");
         } else if (activeLevel === 4) {
@@ -376,6 +381,7 @@
     }, {passive: false});
 
     function confirmPlacement() {
+        if (roundDone) return;
         let activeLv = currentLevel;
         if (currentLevel === 8 || currentLevel === 9) {
             activeLv = currentTaskLevel;
@@ -390,18 +396,18 @@
         // Prüfe ob der gesetzte Notenname dem gesuchten entspricht
         if (placedNoteKey === targetNoteLetter) {
             if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            drawNote(placedNoteKey, "q", 150, "#2ecc71");
+            drawNote(placedNoteKey, "q", 150, "#12b76a");
             handleCorrect();
         } else {
-            drawNote(placedNoteKey, "q", 150, "#e74c3c");
+            drawNote(placedNoteKey, "q", 150, "#e5484d");
             handleWrong();
         }
     }
 
     function handleCorrect() {
         const feedback = $id("feedback");
-        feedback.innerText = "Korrekt! 🌟";
-        feedback.style.color = "#2ecc71";
+        feedback.innerText = "Korrekt!";
+        feedback.style.color = "#12b76a";
 
         if (!isCurrentRoundFailed) {
             score++;
@@ -409,19 +415,37 @@
         }
 
         roundCount++;
-        setTimeout(nextRound, 800);
+        roundDone = true;
+        showContinue();
+    }
+
+    /* Nach einer richtigen Loesung bleibt alles stehen, bis geklickt wird. */
+    function showContinue() {
+        ["input-buttons", "duration-buttons", "placement-buttons"].forEach(function (id) {
+            const e = $id(id);
+            if (e) e.style.display = "none";
+        });
+        const box = $id("continue");
+        if (!box) return;
+        box.innerHTML = "";
+        const b = document.createElement("button");
+        b.className = "continue-btn";
+        b.textContent = (roundCount >= totalRoundsForCurrentLevel) ? "Ergebnis anzeigen" : "Weiter";
+        b.addEventListener("click", nextRound);
+        box.appendChild(b);
+        box.style.display = "block";
     }
 
     function handleWrong() {
         const feedback = $id("feedback");
-        feedback.innerText = "Falsch! ❌";
-        feedback.style.color = "#e74c3c";
+        feedback.innerText = "Falsch!";
+        feedback.style.color = "#e5484d";
         isCurrentRoundFailed = true;
 
         // Tastenfarbe bei Fehler nach kurzer Zeit zurücksetzen
         setTimeout(() => {
             const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = k.classList.contains('black') ? 'black' : 'white'; });
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
 
             // Note wieder schwarz zeichnen
             let activeLv = currentLevel;
@@ -437,7 +461,7 @@
 
             isNoteLocked = false;
             feedback.innerText = "Versuche es erneut...";
-            feedback.style.color = "#f39c12"; // Orange für Wiederholung
+            feedback.style.color = "#f59e0b"; // Orange für Wiederholung
         }, 1200);
     }
 
@@ -459,8 +483,8 @@
         $id("modalStats").innerText = `${score} / ${totalRoundsForCurrentLevel} (${Math.round(percentage)}%)`;
 
         if (passed) {
-            $id("modalTitle").innerText = "Level Geschafft! 🎉";
-            $id("modalGrade").style.color = "#2ecc71";
+            $id("modalTitle").innerText = "Level geschafft!";
+            $id("modalGrade").style.color = "#12b76a";
 
             if (isSpecLevel) {
                 if (subLevelIndex < 6) {
@@ -506,8 +530,8 @@
                 }
             }
         } else {
-            $id("modalTitle").innerText = "Nicht bestanden 😕";
-            $id("modalGrade").style.color = "#e74c3c";
+            $id("modalTitle").innerText = "Nicht bestanden";
+            $id("modalGrade").style.color = "#e5484d";
 
             let req = isSpecLevel ? "Note 2" : "Note 3";
             $id("modalText").innerText = `Wiederhole das Level für eine bessere Note (mind. ${req}).`;
@@ -538,6 +562,7 @@
     }
 
     function checkAnswer(guess) {
+        if (roundDone) return;
         if (currentLevel === 3 || currentLevel === 4) return;
         if (currentLevel === 8 || currentLevel === 9) {
             if (currentTaskLevel === 3 || currentTaskLevel === 4) return;
@@ -546,15 +571,16 @@
         let expected = noteLetter === 'b' ? 'H' : noteLetter.toUpperCase();
         if (guess === expected) {
             if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#2ecc71");
+            drawNote(currentNoteKey, currentNoteDuration, 150, "#12b76a");
             handleCorrect();
         } else {
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#e74c3c");
+            drawNote(currentNoteKey, currentNoteDuration, 150, "#e5484d");
             handleWrong();
         }
     }
 
     function checkDuration(guess) {
+        if (roundDone) return;
         if (currentLevel === 8 || currentLevel === 9) {
             if (currentTaskLevel !== 4) return;
         } else {
@@ -562,15 +588,16 @@
         }
         if (guess === currentNoteDuration) {
             if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#2ecc71");
+            drawNote(currentNoteKey, currentNoteDuration, 150, "#12b76a");
             handleCorrect();
         } else {
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#e74c3c");
+            drawNote(currentNoteKey, currentNoteDuration, 150, "#e5484d");
             handleWrong();
         }
     }
 
     function checkPianoKey(guess, element) {
+        if (roundDone) return;
         let activeLv = currentLevel;
         if (currentLevel === 8 || currentLevel === 9) {
             activeLv = currentTaskLevel;
@@ -588,15 +615,15 @@
 
         if (isCorrect) {
             if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            element.style.background = "#2ecc71"; // Grün bei Erfolg
+            element.style.background = "#12b76a"; element.style.color = "#fff"; // Grün bei Erfolg
             if (activeLv === 6 || activeLv === 7) {
-                drawNote(currentNoteKey, "q", 150, "#2ecc71");
+                drawNote(currentNoteKey, "q", 150, "#12b76a");
             }
             handleCorrect();
         } else {
-            element.style.background = "#e74c3c"; // Rot bei Fehler
+            element.style.background = "#e5484d"; element.style.color = "#fff"; // Rot bei Fehler
             if (activeLv === 6 || activeLv === 7) {
-                drawNote(currentNoteKey, "q", 150, "#e74c3c");
+                drawNote(currentNoteKey, "q", 150, "#e5484d");
             }
             handleWrong();
         }
@@ -660,7 +687,7 @@
             if (btn) {
                 const isLocked = (i !== 4 && i > maxUnlockedLevel);
                 btn.className = isLocked ? "lvl-locked" : "";
-                btn.style.background = (i === currentLevel) ? "#2ecc71" : (isLocked ? "#95a5a6" : "#4a90e2");
+                btn.style.background = (i === currentLevel) ? "#12b76a" : (isLocked ? "#98a2b3" : "#3b5bdb");
 
                 // Während Marathon andere Buttons sperren
                 if (isMarathon && i !== lvl) {
@@ -683,9 +710,9 @@
     }
 
     function unlockAllLevels() {
-        $id("unlockTitle").innerText = "Freischaltung 🔑";
-        $id("unlockTitle").style.color = "#f1c40f";
-        $id("unlockIcon").innerText = "👨‍🏫";
+        $id("unlockTitle").innerText = "Freischaltung";
+        $id("unlockTitle").style.color = "#eab308";
+        $id("unlockIcon").innerText = "";
         $id("unlockText").innerText = "Gib das Passwort ein:";
         $id("passwordContainer").style.display = "block";
         $id("unlockActionBtns").style.display = "flex";
@@ -706,9 +733,9 @@
             setLevel(currentLevel);
             showUnlockSuccess("Level 1 bis 5 wurden freigeschaltet!");
         } else {
-            $id("unlockTitle").innerText = "Falsches Passwort! ❌";
-            $id("unlockTitle").style.color = "#e74c3c";
-            $id("unlockIcon").innerText = "🚫";
+            $id("unlockTitle").innerText = "Falsches Passwort!";
+            $id("unlockTitle").style.color = "#e5484d";
+            $id("unlockIcon").innerText = "";
             $id("unlockText").innerText = "Bitte versuche es erneut.";
             $id("unlockPassword").value = "";
             $id("unlockPassword").focus();
@@ -716,9 +743,9 @@
     }
 
     function showUnlockSuccess(message) {
-        $id("unlockTitle").innerText = "Erfolg! 🎉";
-        $id("unlockTitle").style.color = "#2ecc71";
-        $id("unlockIcon").innerText = "🔓";
+        $id("unlockTitle").innerText = "Erfolg!";
+        $id("unlockTitle").style.color = "#12b76a";
+        $id("unlockIcon").innerText = "";
         $id("unlockText").innerText = message;
         $id("passwordContainer").style.display = "none";
         $id("unlockActionBtns").style.display = "none";

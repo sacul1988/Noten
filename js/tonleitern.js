@@ -37,7 +37,7 @@ const TonleiterApp = (function () {
         const colors = shown.map(function () { return "black"; });
         if (wrongKey) {
             shown.push(wrongKey);
-            colors.push("#e74c3c");
+            colors.push("#e5484d");
         }
         ctx.staff(shown, { width: 880, scale: 1.3, staveWidth: 640, height: 140 });
     }
@@ -62,11 +62,9 @@ const TonleiterApp = (function () {
                     ctx.hint(schemaHtml(opts.schema));
                     drawProgress(ctx);
                     if (placed >= scale.length) {
-                        ctx.keyboard(false);
-                        ctx.clearAnswers();
-                        ctx.solved("Tonleiter komplett! 🌟");
+                        ctx.solved("Tonleiter komplett: " + scale.map(Core.german).join(" – "));
                     } else {
-                        ctx.feedback("Weiter so — noch " + (scale.length - placed) + " Töne.", "#2ecc71");
+                        ctx.feedback("Weiter so — noch " + (scale.length - placed) + " Töne.", "#12b76a");
                     }
                 }
 
@@ -75,10 +73,10 @@ const TonleiterApp = (function () {
                     ctx.keyboard("c/4", "c/6", function (m, keyEl) {
                         if (placed >= scale.length) return;
                         if (m === Core.midi(scale[placed])) {
-                            keyEl.style.background = "#2ecc71";
+                            ctx.paintKey(keyEl, "#12b76a");
                             accept(ctx);
                         } else {
-                            keyEl.style.background = "#e74c3c";
+                            ctx.paintKey(keyEl, "#e5484d");
                             ctx.failed("Das ist nicht der nächste Ton. Zähle die Halbtonschritte!");
                             setTimeout(function () { ctx.resetKeysExceptPlaced(); }, 900);
                         }
@@ -89,7 +87,7 @@ const TonleiterApp = (function () {
                         ctx.resetKeys();
                         for (let i = 0; i < placed; i++) {
                             const k = ctx.keyEl(Core.midi(scale[i]));
-                            if (k) k.style.background = "#2ecc71";
+                            if (k) ctx.paintKey(k, "#12b76a");
                         }
                     };
                     ctx.resetKeysExceptPlaced();

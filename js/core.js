@@ -247,10 +247,18 @@ const Core = (function () {
         return el.querySelector('.piano-key[data-midi="' + m + '"]');
     }
 
+    /* Eingefärbte Taste: die Beschriftung muss auf der Farbe lesbar bleiben. */
+    function paintKey(el, color) {
+        if (!el) return;
+        el.style.background = color;
+        el.style.color = "#fff";
+    }
+
     function resetKeys(el) {
         if (!el) return;
         el.querySelectorAll(".piano-key").forEach(function (k) {
-            k.style.background = k.classList.contains("black") ? "#333" : "white";
+            k.style.background = "";
+            k.style.color = "";
         });
     }
 
@@ -268,6 +276,7 @@ const Core = (function () {
         let score = 0;
         let roundCount = 0;
         let roundFailed = false;
+        let roundDone = false;      // gelöst, wartet auf "Weiter"
         let started = false;
         let el = {};
 
@@ -276,7 +285,7 @@ const Core = (function () {
         function buildDom() {
             root.innerHTML =
                 '<div class="module-header">' +
-                    '<button class="menu-btn js-menu">🏠 Menü</button>' +
+                    '<button class="menu-btn js-menu">Menü</button>' +
                     '<h2>' + cfg.title + '</h2>' +
                     '<div class="header-spacer"></div>' +
                 '</div>' +
@@ -290,6 +299,7 @@ const Core = (function () {
                 '<div class="feedback-text js-feedback"></div>' +
                 '<div class="round-info js-round"></div>' +
                 '<div class="js-answers"></div>' +
+                '<div class="continue-box js-continue"></div>' +
                 '<div class="piano-container wide js-keyboard"></div>' +
                 modalMarkup();
 
@@ -303,6 +313,7 @@ const Core = (function () {
                 feedback: root.querySelector(".js-feedback"),
                 round:    root.querySelector(".js-round"),
                 answers:  root.querySelector(".js-answers"),
+                cont:     root.querySelector(".js-continue"),
                 keyboard: root.querySelector(".js-keyboard"),
                 result:   root.querySelector(".js-result-modal"),
                 lock:     root.querySelector(".js-lock-modal"),
@@ -324,23 +335,22 @@ const Core = (function () {
                 '<button class="modal-btn js-result-ok">Weiter</button>' +
             '</div></div>' +
             '<div class="modal js-lock-modal"><div class="modal-content">' +
-                '<h3 style="color:#e74c3c">Level gesperrt! 🔒</h3>' +
-                '<div style="font-size:4rem;margin:1rem 0">🚫</div>' +
+                '<h3 style="color:#e5484d">Level gesperrt!</h3>' +
                 '<div class="result-stats">Noch nicht freigeschaltet</div>' +
                 '<div style="margin-bottom:1.5rem">Du musst erst das vorherige Level mit mindestens ' +
                     '<b>Note 3</b> bestehen, um hier fortzufahren.</div>' +
                 '<button class="modal-btn js-lock-ok">Verstanden</button>' +
             '</div></div>' +
             '<div class="modal js-unlock-modal"><div class="modal-content">' +
-                '<h3 class="js-unlock-title" style="color:#f1c40f">Freischaltung 🔑</h3>' +
-                '<div class="js-unlock-icon" style="font-size:3rem;margin:0.5rem 0">👨‍🏫</div>' +
+                '<h3 class="js-unlock-title" style="color:#eab308">Freischaltung</h3>' +
+                '<div class="js-unlock-icon"></div>' +
                 '<p class="js-unlock-text">Gib das Passwort ein:</p>' +
                 '<div class="js-unlock-input-wrap">' +
                     '<input type="password" class="unlock-input js-unlock-input">' +
                 '</div>' +
                 '<div class="js-unlock-actions" style="display:flex;gap:10px">' +
-                    '<button class="modal-btn js-unlock-cancel" style="background:#95a5a6">Abbrechen</button>' +
-                    '<button class="modal-btn js-unlock-ok" style="background:#f1c40f;color:#000">OK</button>' +
+                    '<button class="modal-btn js-unlock-cancel" style="background:#98a2b3">Abbrechen</button>' +
+                    '<button class="modal-btn js-unlock-ok" style="background:#eab308;color:#000">OK</button>' +
                 '</div>' +
                 '<button class="modal-btn js-unlock-close" style="display:none">Verstanden</button>' +
             '</div></div>';
@@ -373,7 +383,7 @@ const Core = (function () {
                 el.levels.appendChild(b);
             });
             const unlockBtn = document.createElement("button");
-            unlockBtn.textContent = "🔓";
+            unlockBtn.textContent = "Freischalten";
             unlockBtn.className = "unlock-btn";
             unlockBtn.title = "Alle Level freischalten";
             unlockBtn.addEventListener("click", openUnlock);
@@ -386,7 +396,7 @@ const Core = (function () {
                 const b = btns[i];
                 const isLocked = i > maxUnlocked;
                 b.className = isLocked ? "lvl-locked" : "";
-                b.style.background = (i === levelIndex) ? "#2ecc71" : (isLocked ? "#95a5a6" : "#4a90e2");
+                b.style.background = (i === levelIndex) ? "#12b76a" : (isLocked ? "#98a2b3" : "#3b5bdb");
             });
         }
 
@@ -410,10 +420,15 @@ const Core = (function () {
             keyboard: function (fromKey, toKey, onKey, options) {
                 if (!fromKey) { el.keyboard.style.display = "none"; el.keyboard.innerHTML = ""; return; }
                 el.keyboard.style.display = "flex";
-                buildKeyboard(el.keyboard, fromKey, toKey, onKey, options);
+                const guarded = onKey && function (m, keyEl) {
+                    if (roundDone) return;          // gelöste Runde nicht mehr verändern
+                    onKey(m, keyEl);
+                };
+                buildKeyboard(el.keyboard, fromKey, toKey, guarded, options);
             },
 
             keyEl: function (m) { return keyElement(el.keyboard, m); },
+            paintKey: paintKey,
             resetKeys: function () { resetKeys(el.keyboard); },
 
             answers: function (list, onClick) {
@@ -428,6 +443,7 @@ const Core = (function () {
                     b.textContent = item.label !== undefined ? item.label : item;
                     if (item.color) b.style.background = item.color;
                     b.addEventListener("click", function () {
+                        if (roundDone) return;
                         onClick(item.value !== undefined ? item.value : item, b);
                     });
                     grid.appendChild(b);
@@ -442,19 +458,23 @@ const Core = (function () {
                 el.feedback.style.color = color || "#333";
             },
 
+            /* Die gelöste Aufgabe bleibt stehen — Noten und Klaviatur zeigen
+               weiter das Ergebnis, weiter geht es erst auf Klick. */
             solved: function (message) {
-                ctx.feedback(message || "Korrekt! 🌟", "#2ecc71");
+                ctx.feedback(message || "Korrekt!", "#12b76a");
                 if (!roundFailed) {
                     score++;
                     el.score.innerText = score;
                 }
                 roundCount++;
-                setTimeout(nextRound, 900);
+                roundDone = true;
+                el.answers.innerHTML = "";
+                showContinue();
             },
 
             failed: function (message) {
                 roundFailed = true;
-                ctx.feedback(message || "Falsch! ❌ Versuche es noch einmal.", "#e74c3c");
+                ctx.feedback(message || "Falsch!  Versuche es noch einmal.", "#e5484d");
             },
 
             german: german,
@@ -463,7 +483,20 @@ const Core = (function () {
 
         /* ------------------------------------------------------------ Ablauf */
 
+        function showContinue() {
+            el.cont.innerHTML = "";
+            const b = document.createElement("button");
+            b.className = "continue-btn";
+            b.textContent = (roundCount >= totalRounds) ? "Ergebnis anzeigen" : "Weiter";
+            b.addEventListener("click", nextRound);
+            el.cont.appendChild(b);
+            el.cont.style.display = "block";
+        }
+
         function nextRound() {
+            el.cont.style.display = "none";
+            el.cont.innerHTML = "";
+            roundDone = false;
             if (roundCount >= totalRounds) { showResult(); return; }
             roundFailed = false;
             ctx.feedback("");
@@ -499,11 +532,11 @@ const Core = (function () {
             const isLast = levelIndex >= levels.length - 1;
 
             root.querySelector(".js-result-grade").innerText = grade;
-            root.querySelector(".js-result-grade").style.color = passed ? "#2ecc71" : "#e74c3c";
+            root.querySelector(".js-result-grade").style.color = passed ? "#12b76a" : "#e5484d";
             root.querySelector(".js-result-stats").innerText =
                 score + " / " + totalRounds + " (" + Math.round(percentage) + "%)";
             root.querySelector(".js-result-title").innerText =
-                passed ? "Level geschafft! 🎉" : "Nicht bestanden 😕";
+                passed ? "Level geschafft!" : "Nicht bestanden";
 
             if (passed && !isLast) {
                 if (maxUnlocked < levelIndex + 1) maxUnlocked = levelIndex + 1;
@@ -531,9 +564,9 @@ const Core = (function () {
         /* ------------------------------------------------------ Freischaltung */
 
         function openUnlock() {
-            root.querySelector(".js-unlock-title").innerText = "Freischaltung 🔑";
-            root.querySelector(".js-unlock-title").style.color = "#f1c40f";
-            root.querySelector(".js-unlock-icon").innerText = "👨‍🏫";
+            root.querySelector(".js-unlock-title").innerText = "Freischaltung";
+            root.querySelector(".js-unlock-title").style.color = "#eab308";
+            root.querySelector(".js-unlock-icon").innerText = "";
             root.querySelector(".js-unlock-text").innerText = "Gib das Passwort ein:";
             root.querySelector(".js-unlock-input-wrap").style.display = "block";
             root.querySelector(".js-unlock-actions").style.display = "flex";
@@ -548,17 +581,17 @@ const Core = (function () {
             if (input.value === PASSWORD) {
                 maxUnlocked = levels.length - 1;
                 refreshLevelButtons();
-                root.querySelector(".js-unlock-title").innerText = "Erfolg! 🎉";
-                root.querySelector(".js-unlock-title").style.color = "#2ecc71";
-                root.querySelector(".js-unlock-icon").innerText = "🔓";
+                root.querySelector(".js-unlock-title").innerText = "Erfolg!";
+                root.querySelector(".js-unlock-title").style.color = "#12b76a";
+                root.querySelector(".js-unlock-icon").innerText = "";
                 root.querySelector(".js-unlock-text").innerText = "Alle Level wurden freigeschaltet!";
                 root.querySelector(".js-unlock-input-wrap").style.display = "none";
                 root.querySelector(".js-unlock-actions").style.display = "none";
                 root.querySelector(".js-unlock-close").style.display = "block";
             } else {
-                root.querySelector(".js-unlock-title").innerText = "Falsches Passwort! ❌";
-                root.querySelector(".js-unlock-title").style.color = "#e74c3c";
-                root.querySelector(".js-unlock-icon").innerText = "🚫";
+                root.querySelector(".js-unlock-title").innerText = "Falsches Passwort!";
+                root.querySelector(".js-unlock-title").style.color = "#e5484d";
+                root.querySelector(".js-unlock-icon").innerText = "";
                 root.querySelector(".js-unlock-text").innerText = "Bitte versuche es erneut.";
                 input.value = "";
                 input.focus();
@@ -616,6 +649,7 @@ const Core = (function () {
         renderStaff: renderStaff,
         buildKeyboard: buildKeyboard,
         resetKeys: resetKeys,
+        paintKey: paintKey,
         whenVexReady: whenVexReady,
         createModule: createModule,
         pick: pick,
