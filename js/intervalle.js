@@ -24,7 +24,7 @@ const IntervallApp = (function () {
 
     const NOTE_BUTTONS = Core.NOTE_BUTTONS;
 
-    const STAFF_OPTS = { width: 440, scale: 1.7, staveWidth: 215, height: 180 };
+    const STAFF_OPTS = {};
 
     /* --------------------------------------------------------- Aufgabenwahl */
 
@@ -72,20 +72,33 @@ const IntervallApp = (function () {
         ctx.task("Welches Intervall ist das?");
         drawPair(ctx, pair.low, pair.high);
 
+        const ESELSBRUECKEN = {
+            "Prime": "Gleicher Ton (0 Halbtöne)",
+            "Sekunde": "Nachbarton (z.B. Anfang von 'Alle meine Entchen')",
+            "Terz": "Kuckucksruf ('Kuck-kuck!')",
+            "Quarte": "Feuerwehr-Signal ('Ta-tü-ta-ta')",
+            "Quinte": "'Star Wars' / 'Morgen kommt der Weihnachtsmann'",
+            "Sexte": "'My Bonnie lies over the ocean'",
+            "Septime": "Großer Schritt mit hoher Spannung",
+            "Oktave": "'Somewhere over the Rainbow' (gleicher Tonname, 8 Stufen höher)"
+        };
+
         if (opts.keyboard) {
             ctx.keyboard("c/4", "c/6", null);
             [pair.low, pair.high].forEach(function (k) {
                 const e = ctx.keyEl(Core.midi(k));
                 if (e) ctx.paintKey(e, "#3b5bdb");
             });
-            ctx.hint("Zähle auf der Klaviatur die Halbtonschritte zwischen den beiden Tönen.");
+            ctx.hint("");
         } else {
             ctx.keyboard(false);
+            ctx.hint("");
         }
 
         ctx.answers(opts.quality ? FULL_BUTTONS : NUMBER_BUTTONS, function (choice) {
             if (choice === answer) {
                 drawPair(ctx, pair.low, pair.high, ["#12b76a", "#12b76a"]);
+                ctx.playChord([pair.low, pair.high], 1.3);
                 ctx.solved(Core.german(pair.low) + " – " + Core.german(pair.high) +
                            " = " + pair.info.full);
             } else {
@@ -121,6 +134,7 @@ const IntervallApp = (function () {
 
         function success() {
             ctx.staff([low, target], Object.assign({ colors: ["black", "#12b76a"] }, STAFF_OPTS));
+            ctx.playChord([low, target], 1.3);
             ctx.solved("Richtig: " + Core.german(low) + " – " + Core.german(target) +
                        " ist eine " + info.full + ".");
         }
@@ -134,7 +148,6 @@ const IntervallApp = (function () {
                 } else {
                     ctx.paintKey(keyEl, "#e5484d");
                     ctx.failed("Noch nicht richtig — zähle die Halbtonschritte ab " + Core.german(low) + ".");
-                    setTimeout(function () { ctx.resetKeys(); }, 900);
                 }
             });
         } else {

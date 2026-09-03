@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Musik-Trainer</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=93">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vexflow/1.2.93/vexflow-min.js"></script>
 </head>
 <body>
@@ -12,41 +12,51 @@
 <!-- ======================= STARTMENÜ ======================= -->
 <div id="main-menu" class="container menu-page">
     <div class="hero">
-        <div class="hero-staff" aria-hidden="true"></div>
         <h1>Musik&#8209;Trainer</h1>
-        <p class="hero-sub">Noten lesen, schreiben und verstehen — Schritt für Schritt</p>
     </div>
 
     <div class="menu-cards">
-        <button class="menu-card" data-modul="noten" onclick="openModule('noten')">
+        <button class="menu-card" data-modul="notenwerte" onclick="openModule('notenwerte')">
             <span class="card-num">01</span>
-            <span class="card-title">Noten</span>
-            <span class="card-desc">Notennamen und Notenwerte erkennen, Noten platzieren und auf der Klaviatur finden</span>
-            <span class="card-meta">9 Level</span>
+            <span class="card-title">Notenwerte</span>
+            <span class="card-desc">Ganze bis 16tel-Noten, Zählzeiten im 4/4-Takt, Noten-Verhältnisse und Takt-Rätsel</span>
+            <span class="card-meta">8 Level</span>
+        </button>
+        <button class="menu-card" data-modul="noten" onclick="openModule('noten')">
+            <span class="card-num">02</span>
+            <span class="card-title">Noten lesen</span>
+            <span class="card-desc">Notennamen im Violinschlüssel, Hilfslinien, Noten platzieren und auf der Klaviatur finden</span>
+            <span class="card-meta">8 Level</span>
         </button>
         <button class="menu-card" data-modul="vorzeichen" onclick="openModule('vorzeichen')">
-            <span class="card-num">02</span>
+            <span class="card-num">03</span>
             <span class="card-title">Vorzeichen</span>
             <span class="card-desc">Noten mit Kreuz und B benennen, setzen und auf der Klaviatur spielen</span>
+            <span class="card-meta">10 Level</span>
+        </button>
+        <button class="menu-card" data-modul="pausen" onclick="openModule('pausen')">
+            <span class="card-num">04</span>
+            <span class="card-title">Pausen</span>
+            <span class="card-desc">Ganze bis 16tel-Pause, Zählzeiten der Stille, Note-Pause-Zuordnung und Takt-Rätsel</span>
             <span class="card-meta">8 Level</span>
         </button>
         <button class="menu-card" data-modul="tonleitern" onclick="openModule('tonleitern')">
-            <span class="card-num">03</span>
+            <span class="card-num">05</span>
             <span class="card-title">Tonleitern</span>
             <span class="card-desc">Dur- und Moll-Tonleitern aufwärts aufbauen, mit Ganz- und Halbtonschritten</span>
-            <span class="card-meta">8 Level</span>
+            <span class="card-meta">10 Level</span>
+        </button>
+        <button class="menu-card" data-modul="dreiklaenge" onclick="openModule('dreiklaenge')">
+            <span class="card-num">06</span>
+            <span class="card-title">Dreiklänge</span>
+            <span class="card-desc">Dur- und Moll-Dreiklänge in Grundstellung setzen, erkennen und benennen</span>
+            <span class="card-meta">10 Level</span>
         </button>
         <button class="menu-card" data-modul="intervalle" onclick="openModule('intervalle')">
-            <span class="card-num">04</span>
+            <span class="card-num">07</span>
             <span class="card-title">Intervalle</span>
             <span class="card-desc">Abstände zwischen zwei Noten bestimmen und selbst aufbauen</span>
             <span class="card-meta">8 Level</span>
-        </button>
-        <button class="menu-card" data-modul="dreiklaenge" onclick="openModule('dreiklaenge')">
-            <span class="card-num">05</span>
-            <span class="card-title">Dreiklänge</span>
-            <span class="card-desc">Dur- und Moll-Dreiklänge in Grundstellung schreiben und benennen</span>
-            <span class="card-meta">6 Level</span>
         </button>
     </div>
 </div>
@@ -89,110 +99,120 @@
         </div>
     </div>
 
-    <div class="module-header">
-        <button class="menu-btn" onclick="backToMenu()">Menü</button>
-        <h2>Noten</h2>
-        <div class="header-spacer"></div>
-    </div>
-    <div class="score-board">
-        Richtig: <span id="n-score">0</span>
-        <div class="lvl-btns">
-            <button id="n-btn-lvl4" onclick="NotenApp.setLevel(4)">Level 1</button>
-            <button id="n-btn-lvl1" onclick="NotenApp.setLevel(1)">Level 2</button>
-            <button id="n-btn-lvl2" onclick="NotenApp.setLevel(2)">Level 3</button>
-            <button id="n-btn-lvl3" onclick="NotenApp.setLevel(3)">Level 4</button>
-            <button id="n-btn-lvl5" onclick="NotenApp.setLevel(5)">Level 5</button>
-            <button id="n-btn-lvl6" onclick="NotenApp.setLevel(6)">Level 6</button>
-            <button id="n-btn-lvl7" onclick="NotenApp.setLevel(7)">Level 7</button>
-            <button id="n-btn-lvl8" onclick="NotenApp.setLevel(8)">Level 8</button>
-            <button id="n-btn-lvl9" onclick="NotenApp.setLevel(9)">Level 9</button>
-            <button onclick="NotenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
-            <button id="n-btn-cancel" onclick="NotenApp.cancelLevel()" style="background: #e5484d; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
+    <div id="n-feedbackModal" class="modal" style="display: none;">
+        <div class="modal-content feedback-modal-content">
+            <div id="n-f-icon" class="feedback-modal-icon success">✔</div>
+            <h3 id="n-f-title">Richtig!</h3>
+            <div id="n-f-text" class="feedback-modal-text"></div>
+            <button id="n-f-btn" class="modal-btn success-btn">Weiter →</button>
         </div>
     </div>
 
-    <div id="n-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e5484d; margin-bottom: 10px; display: none;">Zeit: 20s</div>
-    <div id="n-output" class="note-output"></div>
-    <div id="n-error-display" style="color: red; font-size: 0.8rem; margin: 5px; display: none;">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
+    <div class="exercise-card">
+        <div class="lvl-bar">
+            <button class="exit-btn" onclick="backToMenu()" title="Zum Menü">✕</button>
+            <div class="lvl-btns">
+                <button id="n-btn-lvl1" onclick="NotenApp.setLevel(1)">Level 1</button>
+                <button id="n-btn-lvl2" onclick="NotenApp.setLevel(2)">Level 2</button>
+                <button id="n-btn-lvl3" onclick="NotenApp.setLevel(3)">Level 3</button>
+                <button id="n-btn-lvl4" onclick="NotenApp.setLevel(4)">Level 4</button>
+                <button id="n-btn-lvl5" onclick="NotenApp.setLevel(5)">Level 5</button>
+                <button id="n-btn-lvl6" onclick="NotenApp.setLevel(6)">Level 6</button>
+                <button id="n-btn-lvl7" onclick="NotenApp.setLevel(7)">Level 7</button>
+                <button id="n-btn-lvl8" onclick="NotenApp.setLevel(8)">Level 8</button>
+                <button onclick="NotenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
+            </div>
+        </div>
+        <div class="fokus-header">
+            <div class="progress-container">
+                <div class="progress-wrap"><div id="n-progress-bar" class="progress-bar"></div></div>
+                <div id="n-round-info" class="round-counter">Runde: 1 / 20</div>
+            </div>
+            <div class="star-badge"><span class="star-icon">★</span><b id="n-score">0</b></div>
+        </div>
 
-    <div id="n-task-instruction" style="font-weight: bold; font-size: 1.3rem; margin-top: 20px; color: #333;">Welche Note ist das?</div>
-    <div id="n-feedback" style="font-weight: bold; height: 30px; font-size: 1.2rem; margin-top: 10px;"></div>
-    <div id="n-round-info" style="font-size: 0.8rem; color: #888; margin-top: 5px;">Runde: 1 / 20</div>
+        <div class="module-stage">
+            <div class="staff-stage-wrap">
+                <div id="n-timer-display" class="timer-badge-left" style="display: none;">Zeit: 20s</div>
+                <div id="n-output" class="note-output"></div>
+            </div>
+            <div id="n-error-display" class="error-note">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
 
-    <div id="n-input-buttons" class="btn-grid">
-        <button onclick="NotenApp.checkAnswer('C')">C</button>
-        <button onclick="NotenApp.checkAnswer('D')">D</button>
-        <button onclick="NotenApp.checkAnswer('E')">E</button>
-        <button onclick="NotenApp.checkAnswer('F')">F</button>
-        <button onclick="NotenApp.checkAnswer('G')">G</button>
-        <button onclick="NotenApp.checkAnswer('A')">A</button>
-        <button onclick="NotenApp.checkAnswer('H')">H</button>
-    </div>
-    <div id="n-duration-buttons" class="btn-grid" style="display: none;">
-        <button onclick="NotenApp.checkDuration('w')">Ganze</button>
-        <button onclick="NotenApp.checkDuration('h')">Halbe</button>
-        <button onclick="NotenApp.checkDuration('q')">Viertel</button>
-        <button onclick="NotenApp.checkDuration('8')">Achtel</button>
-        <button onclick="NotenApp.checkDuration('16')">16.tel</button>
-    </div>
-    <div id="n-placement-buttons" class="btn-grid" style="display: none;">
-        <button onclick="NotenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
-        <button id="n-btn-confirm" onclick="NotenApp.confirmPlacement()" style="background: #3b5bdb; display: none;">Bestätigen</button>
-        <button onclick="NotenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
-    </div>
-    <div id="n-octave-buttons" class="btn-grid" style="display: none;">
-    </div>
+            <div class="task-box">
+                <div id="n-task-instruction" class="task-text">Welche Note ist das?</div>
+            </div>
 
-    <div id="n-continue" class="continue-box"></div>
+            <div class="interactive-area">
+                <div id="n-input-buttons" class="btn-grid">
+                    <button onclick="NotenApp.checkAnswer('C')">C</button>
+                    <button onclick="NotenApp.checkAnswer('D')">D</button>
+                    <button onclick="NotenApp.checkAnswer('E')">E</button>
+                    <button onclick="NotenApp.checkAnswer('F')">F</button>
+                    <button onclick="NotenApp.checkAnswer('G')">G</button>
+                    <button onclick="NotenApp.checkAnswer('A')">A</button>
+                    <button onclick="NotenApp.checkAnswer('H')">H</button>
+                </div>
+                <div id="n-placement-buttons" class="btn-grid" style="display: none;">
+                    <button onclick="NotenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
+                    <button onclick="NotenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
+                </div>
 
-    <!-- Keyboard for Level 5 -->
-    <div id="n-piano-keyboard" class="piano-container" style="display: none;">
-        <div class="piano-key" data-note="C" onclick="NotenApp.checkPianoKey('C', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" data-note="D" onclick="NotenApp.checkPianoKey('D', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" data-note="E" onclick="NotenApp.checkPianoKey('E', this)"></div>
-        <div class="piano-key" data-note="F" onclick="NotenApp.checkPianoKey('F', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" data-note="G" onclick="NotenApp.checkPianoKey('G', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" data-note="A" onclick="NotenApp.checkPianoKey('A', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" data-note="H" onclick="NotenApp.checkPianoKey('H', this)"></div>
-    </div>
+                <!-- Keyboard for Level 4 & 5 -->
+                <div id="n-piano-keyboard" class="piano-container" style="display: none;">
+                    <div class="piano-key" data-note="C" onclick="NotenApp.checkPianoKey('C', this)">C</div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" data-note="D" onclick="NotenApp.checkPianoKey('D', this)">D</div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" data-note="E" onclick="NotenApp.checkPianoKey('E', this)">E</div>
+                    <div class="piano-key" data-note="F" onclick="NotenApp.checkPianoKey('F', this)">F</div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" data-note="G" onclick="NotenApp.checkPianoKey('G', this)">G</div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" data-note="A" onclick="NotenApp.checkPianoKey('A', this)">A</div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" data-note="H" onclick="NotenApp.checkPianoKey('H', this)">H</div>
+                </div>
 
-    <!-- Große Klaviatur für Level 7 -->
-    <div id="n-piano-keyboard-large" class="piano-container large" style="display: none;">
-        <!-- Oktave 4 -->
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('c/4', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('d/4', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('e/4', this)"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('f/4', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('g/4', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('a/4', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('b/4', this)"></div>
+                <!-- Große Klaviatur für Level 6 & 8 -->
+                <div id="n-piano-keyboard-large" class="piano-container large" style="display: none;">
+                    <!-- Oktave 4 -->
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('c/4', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('d/4', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('e/4', this)"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('f/4', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('g/4', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('a/4', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('b/4', this)"></div>
 
-        <!-- Oktave 5 -->
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('c/5', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('d/5', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('e/5', this)"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('f/5', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('g/5', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('a/5', this)"></div>
-        <div class="piano-key black"></div>
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('b/5', this)"></div>
+                    <!-- Oktave 5 -->
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('c/5', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('d/5', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('e/5', this)"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('f/5', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('g/5', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('a/5', this)"></div>
+                    <div class="piano-key black"></div>
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('b/5', this)"></div>
 
-        <!-- C6 Abschluss -->
-        <div class="piano-key" onclick="NotenApp.checkPianoKey('c/6', this)"></div>
+                    <!-- C6 Abschluss -->
+                    <div class="piano-key" onclick="NotenApp.checkPianoKey('c/6', this)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-action-bar">
+            <button id="n-btn-cancel" class="cancel-btn" style="display: none;" onclick="NotenApp.cancelLevel()">Abbrechen</button>
+            <button id="n-btn-confirm" class="confirm-btn" style="display: none;" onclick="NotenApp.confirmPlacement()">Bestätigen</button>
+            <button id="n-continue-btn" class="continue-btn" disabled onclick="NotenApp.onContinue()">Weiter →</button>
+        </div>
     </div>
 </div>
 
@@ -234,138 +254,144 @@
         </div>
     </div>
 
-    <div class="module-header">
-        <button class="menu-btn" onclick="backToMenu()">Menü</button>
-        <h2>Vorzeichen</h2>
-        <div class="header-spacer"></div>
-    </div>
-    <div class="score-board">
-        Richtig: <span id="v-score">0</span>
-        <div class="lvl-btns">
-            <button id="v-btn-lvl1" onclick="VorzeichenApp.setLevel(1)">Level 1</button>
-            <button id="v-btn-lvl2" onclick="VorzeichenApp.setLevel(2)">Level 2</button>
-            <button id="v-btn-lvl3" onclick="VorzeichenApp.setLevel(3)">Level 3</button>
-            <button id="v-btn-lvl5" onclick="VorzeichenApp.setLevel(5)">Level 4</button>
-            <button id="v-btn-lvl6" onclick="VorzeichenApp.setLevel(6)">Level 5</button>
-            <button id="v-btn-lvl7" onclick="VorzeichenApp.setLevel(7)">Level 6</button>
-            <button id="v-btn-lvl8" onclick="VorzeichenApp.setLevel(8)">Level 7</button>
-            <button id="v-btn-lvl9" onclick="VorzeichenApp.setLevel(9)">Level 8</button>
-            <button onclick="VorzeichenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
-            <button id="v-btn-cancel" onclick="VorzeichenApp.cancelLevel()" style="background: #e5484d; color: white; display: none; padding: 5px 12px; font-size: 1rem; border-radius: 8px; margin-left: 25px; border: 2px solid white;">Level abbrechen</button>
+    <div id="v-feedbackModal" class="modal" style="display: none;">
+        <div class="modal-content feedback-modal-content">
+            <div id="v-f-icon" class="feedback-modal-icon success">✔</div>
+            <h3 id="v-f-title">Richtig!</h3>
+            <div id="v-f-text" class="feedback-modal-text"></div>
+            <button id="v-f-btn" class="modal-btn success-btn">Weiter →</button>
         </div>
     </div>
 
-    <div id="v-timer-display" style="font-size: 1.5rem; font-weight: bold; color: #e5484d; margin-bottom: 10px; display: none;">Zeit: 20s</div>
-    <div id="v-output" class="note-output"></div>
-    <div id="v-error-display" style="color: red; font-size: 0.8rem; margin: 5px; display: none;">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
-
-    <div id="v-feedback" style="margin-top: 25px; font-weight: bold; height: 30px; font-size: 1.2rem;">Welche Note ist das?</div>
-    <div id="v-round-info" style="font-size: 0.8rem; color: #888; margin-top: 5px;">Runde: 1 / 20</div>
-
-    <div id="v-input-buttons" class="btn-grid">
-        <div style="width: 100%; display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; justify-content: center;">
-            <button onclick="VorzeichenApp.checkAnswer('C')" class="answer-btn dense-btn">C</button>
-            <button onclick="VorzeichenApp.checkAnswer('C#')" class="answer-btn dense-btn">Cis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Db')" class="answer-btn dense-btn">Des</button>
-            <button onclick="VorzeichenApp.checkAnswer('D')" class="answer-btn dense-btn">D</button>
-            <button onclick="VorzeichenApp.checkAnswer('D#')" class="answer-btn dense-btn">Dis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Eb')" class="answer-btn dense-btn">Es</button>
-            <button onclick="VorzeichenApp.checkAnswer('E')" class="answer-btn dense-btn">E</button>
-            <button onclick="VorzeichenApp.checkAnswer('F')" class="answer-btn dense-btn">F</button>
-
-            <button onclick="VorzeichenApp.checkAnswer('F#')" class="answer-btn dense-btn">Fis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Gb')" class="answer-btn dense-btn">Ges</button>
-            <button onclick="VorzeichenApp.checkAnswer('G')" class="answer-btn dense-btn">G</button>
-            <button onclick="VorzeichenApp.checkAnswer('G#')" class="answer-btn dense-btn">Gis</button>
-            <button onclick="VorzeichenApp.checkAnswer('Ab')" class="answer-btn dense-btn">As</button>
-            <button onclick="VorzeichenApp.checkAnswer('A')" class="answer-btn dense-btn">A</button>
-            <button onclick="VorzeichenApp.checkAnswer('B')" class="answer-btn dense-btn">B</button>
-            <button onclick="VorzeichenApp.checkAnswer('H')" class="answer-btn dense-btn">H</button>
+    <div class="exercise-card">
+        <div class="lvl-bar">
+            <button class="exit-btn" onclick="backToMenu()" title="Zum Menü">✕</button>
+            <div class="lvl-btns">
+                <button id="v-btn-lvl1" onclick="VorzeichenApp.setLevel(1)">Level 1</button>
+                <button id="v-btn-lvl2" onclick="VorzeichenApp.setLevel(2)">Level 2</button>
+                <button id="v-btn-lvl3" onclick="VorzeichenApp.setLevel(3)">Level 3</button>
+                <button id="v-btn-lvl4" onclick="VorzeichenApp.setLevel(4)">Level 4</button>
+                <button id="v-btn-lvl5" onclick="VorzeichenApp.setLevel(5)">Level 5</button>
+                <button id="v-btn-lvl6" onclick="VorzeichenApp.setLevel(6)">Level 6</button>
+                <button id="v-btn-lvl7" onclick="VorzeichenApp.setLevel(7)">Level 7</button>
+                <button id="v-btn-lvl8" onclick="VorzeichenApp.setLevel(8)">Level 8</button>
+                <button id="v-btn-lvl9" onclick="VorzeichenApp.setLevel(9)">Level 9</button>
+                <button id="v-btn-lvl10" onclick="VorzeichenApp.setLevel(10)">Level 10</button>
+                <button onclick="VorzeichenApp.unlockAllLevels()" class="unlock-btn" title="Alle Level freischalten">Freischalten</button>
+            </div>
         </div>
-    </div>
-    <div id="v-duration-buttons" class="btn-grid" style="display: none;">
-        <button onclick="VorzeichenApp.checkDuration('w')">Ganze</button>
-        <button onclick="VorzeichenApp.checkDuration('h')">Halbe</button>
-        <button onclick="VorzeichenApp.checkDuration('q')">Viertel</button>
-        <button onclick="VorzeichenApp.checkDuration('8')">Achtel</button>
-        <button onclick="VorzeichenApp.checkDuration('16')">16.tel</button>
-    </div>
-    <div id="v-placement-buttons" class="btn-grid" style="display: none;">
-        <div style="width: 100%; display: flex; gap: 8px; justify-content: center; margin-bottom: 5px;">
-            <button id="v-btn-acc-sharp" onclick="VorzeichenApp.setAccidental('#')" style="background: #667085; flex: none; width: 60px;">#</button>
-            <button id="v-btn-acc-flat" onclick="VorzeichenApp.setAccidental('b')" style="background: #667085; flex: none; width: 60px;">b</button>
+        <div class="fokus-header">
+            <div class="progress-container">
+                <div class="progress-wrap"><div id="v-progress-bar" class="progress-bar"></div></div>
+                <div id="v-round-info" class="round-counter">Runde: 1 / 20</div>
+            </div>
+            <div class="star-badge"><span class="star-icon">★</span><b id="v-score">0</b></div>
         </div>
-        <button onclick="VorzeichenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
-        <button id="v-btn-confirm" onclick="VorzeichenApp.confirmPlacement()" style="background: #3b5bdb; display: none;">Bestätigen</button>
-        <button onclick="VorzeichenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
-    </div>
-    <div id="v-octave-buttons" class="btn-grid" style="display: none;">
-    </div>
 
-    <div id="v-continue" class="continue-box"></div>
+        <div class="module-stage">
+            <div class="staff-stage-wrap">
+                <div id="v-timer-display" class="timer-badge-left" style="display: none;">Zeit: 20s</div>
+                <div id="v-output" class="note-output"></div>
+            </div>
+            <div id="v-error-display" class="error-note">Fehler beim Laden der Notengrafik. Bitte Seite neu laden.</div>
 
-    <!-- Keyboard for Level 5 -->
-    <div id="v-piano-keyboard" class="piano-container" style="display: none;">
-        <div class="piano-key" data-note="C" onclick="VorzeichenApp.checkPianoKey('C', this)"></div>
-        <div class="piano-key black" data-note="C#" onclick="VorzeichenApp.checkPianoKey('C#', this)" title="Cis"></div>
-        <div class="piano-key" data-note="D" onclick="VorzeichenApp.checkPianoKey('D', this)"></div>
-        <div class="piano-key black" data-note="D#" onclick="VorzeichenApp.checkPianoKey('D#', this)" title="Dis"></div>
-        <div class="piano-key" data-note="E" onclick="VorzeichenApp.checkPianoKey('E', this)"></div>
-        <div class="piano-key" data-note="F" onclick="VorzeichenApp.checkPianoKey('F', this)"></div>
-        <div class="piano-key black" data-note="F#" onclick="VorzeichenApp.checkPianoKey('F#', this)" title="Fis"></div>
-        <div class="piano-key" data-note="G" onclick="VorzeichenApp.checkPianoKey('G', this)"></div>
-        <div class="piano-key black" data-note="G#" onclick="VorzeichenApp.checkPianoKey('G#', this)" title="Gis"></div>
-        <div class="piano-key" data-note="A" onclick="VorzeichenApp.checkPianoKey('A', this)"></div>
-        <div class="piano-key black" data-note="B" onclick="VorzeichenApp.checkPianoKey('B', this)" title="B (Bb)"></div>
-        <div class="piano-key" data-note="H" onclick="VorzeichenApp.checkPianoKey('H', this)"></div>
-    </div>
+            <div class="task-box">
+                <div id="v-feedback" class="task-text">Bestimme oder setze die Note</div>
+            </div>
 
-    <!-- Große Klaviatur für Level 7 -->
-    <div id="v-piano-keyboard-large" class="piano-container large" style="display: none;">
-        <!-- Oktave 4 -->
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/4', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('c#/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('d/4', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('eb/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('e/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('f/4', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('f#/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('g/4', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('g#/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('a/4', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('bb/4', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('b/4', this)"></div>
+            <div class="interactive-area">
+                <div id="v-input-buttons" class="btn-grid"></div>
+                <div id="v-duration-buttons" class="btn-grid" style="display: none;">
+                    <button onclick="VorzeichenApp.checkDuration('w')">Ganze</button>
+                    <button onclick="VorzeichenApp.checkDuration('h')">Halbe</button>
+                    <button onclick="VorzeichenApp.checkDuration('q')">Viertel</button>
+                    <button onclick="VorzeichenApp.checkDuration('8')">Achtel</button>
+                    <button onclick="VorzeichenApp.checkDuration('16')">16.tel</button>
+                </div>
+                <div id="v-placement-buttons" class="btn-grid" style="display: none;">
+                    <div style="width: 100%; display: flex; gap: 8px; justify-content: center; margin-bottom: 5px;">
+                        <button id="v-btn-acc-sharp" onclick="VorzeichenApp.setAccidental('#')" style="background: #667085; flex: none; width: 60px;">#</button>
+                        <button id="v-btn-acc-flat" onclick="VorzeichenApp.setAccidental('b')" style="background: #667085; flex: none; width: 60px;">b</button>
+                    </div>
+                    <button onclick="VorzeichenApp.moveNote(-1)" style="background: #f97316;">↓ Tiefer</button>
+                    <button onclick="VorzeichenApp.moveNote(1)" style="background: #16a34a;">↑ Höher</button>
+                </div>
+                <div id="v-octave-buttons" class="btn-grid" style="display: none;"></div>
 
-        <!-- Oktave 5 -->
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/5', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('c#/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('d/5', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('eb/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('e/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('f/5', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('f#/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('g/5', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('g#/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('a/5', this)"></div>
-        <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('bb/5', this)"></div>
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('b/5', this)"></div>
+                <!-- Keyboard for Level 5 -->
+                <div id="v-piano-keyboard" class="piano-container" style="display: none;">
+                    <div class="piano-key" data-note="C" onclick="VorzeichenApp.checkPianoKey('C', this)"></div>
+                    <div class="piano-key black" data-note="C#" onclick="VorzeichenApp.checkPianoKey('C#', this)" title="Cis"></div>
+                    <div class="piano-key" data-note="D" onclick="VorzeichenApp.checkPianoKey('D', this)"></div>
+                    <div class="piano-key black" data-note="D#" onclick="VorzeichenApp.checkPianoKey('D#', this)" title="Dis"></div>
+                    <div class="piano-key" data-note="E" onclick="VorzeichenApp.checkPianoKey('E', this)"></div>
+                    <div class="piano-key" data-note="F" onclick="VorzeichenApp.checkPianoKey('F', this)"></div>
+                    <div class="piano-key black" data-note="F#" onclick="VorzeichenApp.checkPianoKey('F#', this)" title="Fis"></div>
+                    <div class="piano-key" data-note="G" onclick="VorzeichenApp.checkPianoKey('G', this)"></div>
+                    <div class="piano-key black" data-note="G#" onclick="VorzeichenApp.checkPianoKey('G#', this)" title="Gis"></div>
+                    <div class="piano-key" data-note="A" onclick="VorzeichenApp.checkPianoKey('A', this)"></div>
+                    <div class="piano-key black" data-note="B" onclick="VorzeichenApp.checkPianoKey('B', this)" title="B (Bb)"></div>
+                    <div class="piano-key" data-note="H" onclick="VorzeichenApp.checkPianoKey('H', this)"></div>
+                </div>
 
-        <!-- C6 Abschluss -->
-        <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/6', this)"></div>
+                <!-- Große Klaviatur für Level 7 -->
+                <div id="v-piano-keyboard-large" class="piano-container large" style="display: none;">
+                    <!-- Oktave 4 -->
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/4', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('c#/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('d/4', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('eb/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('e/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('f/4', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('f#/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('g/4', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('g#/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('a/4', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('bb/4', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('b/4', this)"></div>
+
+                    <!-- Oktave 5 -->
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/5', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('c#/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('d/5', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('eb/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('e/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('f/5', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('f#/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('g/5', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('g#/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('a/5', this)"></div>
+                    <div class="piano-key black" onclick="VorzeichenApp.checkPianoKey('bb/5', this)"></div>
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('b/5', this)"></div>
+
+                    <!-- C6 Abschluss -->
+                    <div class="piano-key" onclick="VorzeichenApp.checkPianoKey('c/6', this)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bottom-action-bar">
+            <button id="v-btn-cancel" class="cancel-btn" style="display: none;" onclick="VorzeichenApp.cancelLevel()">Abbrechen</button>
+            <button id="v-btn-confirm" class="confirm-btn" style="display: none;" onclick="VorzeichenApp.confirmPlacement()">Bestätigen</button>
+            <button id="v-continue-btn" class="continue-btn" disabled onclick="VorzeichenApp.onContinue()">Weiter →</button>
+        </div>
     </div>
 </div>
 <!-- Module auf Basis des gemeinsamen Kerns; ihr Inhalt wird aus JS aufgebaut -->
+<div id="module-notenwerte" class="container" style="display: none;"></div>
+<div id="module-pausen" class="container" style="display: none;"></div>
 <div id="module-tonleitern" class="container" style="display: none;"></div>
-<div id="module-intervalle" class="container" style="display: none;"></div>
 <div id="module-dreiklaenge" class="container" style="display: none;"></div>
+<div id="module-intervalle" class="container" style="display: none;"></div>
 
-<script src="js/core.js"></script>
-<script src="js/noten.js"></script>
-<script src="js/vorzeichen.js"></script>
-<script src="js/tonleitern.js"></script>
-<script src="js/intervalle.js"></script>
-<script src="js/dreiklaenge.js"></script>
-<script src="js/app.js"></script>
+<script src="js/core.js?v=93"></script>
+<script src="js/notenwerte.js?v=93"></script>
+<script src="js/pausen.js?v=93"></script>
+<script src="js/noten.js?v=93"></script>
+<script src="js/vorzeichen.js?v=93"></script>
+<script src="js/tonleitern.js?v=93"></script>
+<script src="js/dreiklaenge.js?v=93"></script>
+<script src="js/intervalle.js?v=93"></script>
+<script src="js/app.js?v=93"></script>
 
 </body>
 </html>

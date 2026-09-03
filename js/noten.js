@@ -1,8 +1,9 @@
-// ======================= MODUL: NOTEN =======================
-    const NotenApp = (function() {
+// ======================= MODUL: NOTEN (NOTEN LESEN) =======================
+const NotenApp = (function() {
     const root = document.getElementById("module-noten");
     const $id = (id) => document.getElementById("n-" + id);
     const div = $id("output");
+
     let currentNoteKey = "";
     let currentNoteDuration = "q";
     let targetNoteLetter = "";
@@ -10,20 +11,36 @@
     let currentNoteIndex = 7;
     let isNoteLocked = false;
     let isCurrentRoundFailed = false;
-    let roundDone = false;   // geloest, wartet auf "Weiter"
+    let roundDone = false;
     let score = 0;
     let roundCount = 0;
-    let currentLevel = 4;
-    let maxUnlockedLevel = 0; // LocalStorage entfernt
+    let currentLevel = 1;
+    let maxUnlockedLevel = 1;
     let lastNoteOctave = "";
-    let recentNotes = [];
     let timerInterval = null;
     let timerValue = 0;
-    let currentTaskLevel = 4;
+    let currentTaskLevel = 1;
     let subLevelIndex = 0;
     let totalRoundsForCurrentLevel = 20;
     let started = false;
-    const durations = ["w", "h", "q", "8", "16"];
+
+    // Basisnoten (C4 bis C5) für Level 1
+    const basicNotes = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5"];
+    const basicBeutel = Core.createBag(basicNotes);
+
+    // Alle Noten mit Hilfslinien (C4 bis C6) für Level 2..8
+    const notesToPractice = [
+        "c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4",
+        "c/5", "d/5", "e/5", "f/5", "g/5", "a/5", "b/5", "c/6"
+    ];
+    const notenBeutel = Core.createBag(notesToPractice);
+
+    function updateProgressBar() {
+        const bar = $id("progress-bar");
+        if (bar) {
+            bar.style.width = Math.min(100, Math.round((roundCount) / totalRoundsForCurrentLevel * 100)) + "%";
+        }
+    }
 
     function startTimer(seconds) {
         clearInterval(timerInterval);
@@ -58,18 +75,12 @@
         if (display) display.style.display = "none";
     }
 
-    const notesToPractice = ["c/4", "d/4", "e/4", "f/4", "g/4", "a/4", "b/4", "c/5", "d/5", "e/5", "f/5", "g/5", "a/5", "b/5", "c/6"];
-
-    /* Zieht ohne Zurücklegen, damit über ein Level hinweg jede Note
-       vorkommt, statt dass der Zufall manche häuft und andere auslässt. */
-    const notenBeutel = Core.createBag(notesToPractice);
-
     function moveNote(dir) {
         if (roundDone) return;
         let activeLv = currentLevel;
-        if (currentLevel === 8 || currentLevel === 9) {
-            const levels = [4, 1, 2, 3, 5, 6, 7];
-            activeLv = levels[subLevelIndex];
+        if (currentLevel === 7 || currentLevel === 8) {
+            const levels = [1, 2, 3, 4, 5, 6];
+            activeLv = levels[subLevelIndex % levels.length];
         }
         if (activeLv !== 3 || isNoteLocked) return;
         let newIndex = currentNoteIndex + dir;
@@ -97,16 +108,17 @@
 
         div.innerHTML = "";
         try {
-            // Renderer initialisieren
             let rendererType = VF.Renderer.Backends.SVG;
             if (typeof rendererType === "undefined") rendererType = 1;
 
             const renderer = new VF.Renderer(div, rendererType);
-            renderer.resize(550, 250);
+            renderer.resize(700, 180);
             const context = renderer.getContext();
-            context.scale(1.7, 1.7);
+            context.scale(1.3, 1.3);
 
-            const stave = new VF.Stave(25, 10, 275); // Deutlich weniger Abstand nach oben (Y=10)
+            const stave = new VF.Stave(16, 9, 500);
+            stave.setBegBarType(VF.Barline.type.SINGLE);
+            stave.setEndBarType(VF.Barline.type.DOUBLE);
             stave.addClef("treble").setContext(context);
             stave.draw();
 
@@ -114,7 +126,7 @@
                 const note = new VF.StaveNote({ keys: [noteKey], duration: duration });
                 note.setStyle({ fillStyle: color, strokeStyle: color });
 
-                // Halsrichtung anpassen: Ab h/4 (Mittellinie) nach unten
+                // Halsrichtung anpassen: Ab h/4 nach unten
                 const octave = parseInt(noteKey.split('/')[1]);
                 const noteName = noteKey.split('/')[0];
                 if (octave > 4 || (octave === 4 && (noteName === 'b' || noteName === 'h'))) {
@@ -123,22 +135,13 @@
                     note.setStemDirection(1);
                 }
 
-                const voice = new VF.Voice({num_beats: 4,  beat_value: 4});
+                const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
                 voice.setStrict(false);
                 voice.addTickables([note]);
 
-                new VF.Formatter().joinVoices([voice]).format([voice], 200);
+                new VF.Formatter().joinVoices([voice]).format([voice], 400);
 
-                // Mitte des Systems
-                let noteX = 135;
-                let activeLv = currentLevel;
-                if (currentLevel === 8 || currentLevel === 9) {
-                    const levels = [4, 1, 2, 3, 5, 6, 7];
-                    activeLv = levels[subLevelIndex];
-                }
-                if (activeLv === 3) {
-                    noteX = Math.max(30, Math.min(xPos, 250));
-                }
+                let noteX = Math.round(16 + 490 / 2 - 18);
                 stave.setNoteStartX(noteX);
 
                 voice.draw(context, stave);
@@ -154,8 +157,16 @@
 
     function nextRound() {
         roundDone = false;
-        const contBox = $id("continue");
-        if (contBox) { contBox.style.display = "none"; contBox.innerHTML = ""; }
+        const btn = $id("continue-btn");
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = (roundCount + 1 >= totalRoundsForCurrentLevel ? "Ergebnis →" : "Weiter →");
+        }
+        const allBtns = root.querySelectorAll("#n-input-buttons button");
+        allBtns.forEach(b => b.classList.remove("wrong", "correct"));
+        const keys = root.querySelectorAll('.piano-key');
+        keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
+
         if (roundCount >= totalRoundsForCurrentLevel) {
             stopTimer();
             showFinalResult();
@@ -165,47 +176,77 @@
         isNoteLocked = false;
         isCurrentRoundFailed = false;
 
-        // Feedback zurücksetzen
         const feedback = $id("feedback");
-        feedback.innerText = "";
-        feedback.style.color = "black";
+        if (feedback) {
+            feedback.innerText = "";
+            feedback.style.color = "black";
+        }
 
         const taskInstr = $id("task-instruction");
 
         let activeLevel = currentLevel;
-        if (currentLevel === 8 || currentLevel === 9) {
-            const levelSequence = [4, 1, 2, 3, 5, 6, 7];
-            activeLevel = levelSequence[subLevelIndex];
+        if (currentLevel === 7) {
+            const levelSequence = [1, 2, 3, 4, 5, 6];
+            activeLevel = levelSequence[subLevelIndex % levelSequence.length];
             currentTaskLevel = activeLevel;
-            if (currentLevel === 8) startTimer(15);
-            else startTimer(10);
+            startTimer(15);
+        } else if (currentLevel === 8) {
+            activeLevel = 8;
+            currentTaskLevel = 8;
+            startTimer(10);
         } else {
             stopTimer();
         }
 
         const confirmBtn = $id("btn-confirm");
         const inputBtns = $id("input-buttons");
-        const durationBtns = $id("duration-buttons");
         const placementBtns = $id("placement-buttons");
         const pianoKeyboard = $id("piano-keyboard");
+        const pianoLarge = $id("piano-keyboard-large");
 
         $id("round-info").innerText = `Runde: ${roundCount + 1} / ${totalRoundsForCurrentLevel}`;
+        updateProgressBar();
 
-        if (activeLevel === 3) {
-            confirmBtn.style.display = "none"; // In der Button-Reihe versteckt, aber hier ID-Steuerung
-            inputBtns.style.display = "none";
-            durationBtns.style.display = "none";
-            placementBtns.style.display = "flex";
-            const pianoLarge = $id("piano-keyboard-large");
+        // ----------------- LEVEL 1: Stammtöne C4 bis C5
+        if (activeLevel === 1) {
+            if (confirmBtn) confirmBtn.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "none";
+            if (pianoKeyboard) pianoKeyboard.style.display = "none";
             if (pianoLarge) pianoLarge.style.display = "none";
-            pianoKeyboard.style.display = "none";
+            if (inputBtns) inputBtns.style.display = "flex";
 
-            // Den Bestätigen-Button innerhalb der Reihe einblenden
-            const rowConfirmBtn = $id("btn-confirm");
-            if (rowConfirmBtn) rowConfirmBtn.style.display = "block";
+            currentNoteKey = basicBeutel.next();
+            currentNoteDuration = "q";
+            if (taskInstr) {
+                taskInstr.innerText = "Welche Note ist das? (C bis C')";
+                taskInstr.style.color = "#333";
+            }
+            drawNote(currentNoteKey, currentNoteDuration);
+        }
+        // ----------------- LEVEL 2: Erweitert mit Hilfslinien (C4 bis C6)
+        else if (activeLevel === 2) {
+            if (confirmBtn) confirmBtn.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "none";
+            if (pianoKeyboard) pianoKeyboard.style.display = "none";
+            if (pianoLarge) pianoLarge.style.display = "none";
+            if (inputBtns) inputBtns.style.display = "flex";
 
-            // Der Beutel verteilt ohnehin gleichmaessig ueber beide Oktaven,
-            // die fruehere Sonderregel fuer den Oktavwechsel entfaellt damit.
+            currentNoteKey = notenBeutel.next();
+            currentNoteDuration = "q";
+            if (taskInstr) {
+                taskInstr.innerText = "Welche Note ist das? (inkl. Hilfslinien)";
+                taskInstr.style.color = "#333";
+            }
+            drawNote(currentNoteKey, currentNoteDuration);
+        }
+        // ----------------- LEVEL 3: Note selbst platzieren
+        else if (activeLevel === 3) {
+            if (inputBtns) inputBtns.style.display = "none";
+            if (pianoKeyboard) pianoKeyboard.style.display = "none";
+            if (pianoLarge) pianoLarge.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "flex";
+            if (confirmBtn) confirmBtn.style.display = "block";
+
             targetNoteLetter = notenBeutel.next();
             lastNoteOctave = targetNoteLetter.split('/')[1];
 
@@ -215,172 +256,110 @@
             let displayTarget = "";
 
             if (name === "C") {
-                if (octave === "4") displayTarget = `"Tiefes" C`;
-                else if (octave === "5") displayTarget = `"Mittleres" C`;
-                else displayTarget = `"Hohes" C`;
+                if (octave === "4") displayTarget = `Tiefes C (unter dem System)`;
+                else if (octave === "5") displayTarget = `Mittleres C (im System)`;
+                else displayTarget = `Hohes C (über dem System)`;
             } else {
-                if (octave === "4") displayTarget = `"Tiefes" ${name}`;
-                else displayTarget = `"Hohes" ${name}`;
+                if (octave === "4") displayTarget = `Tiefes ${name}`;
+                else displayTarget = `Hohes ${name}`;
             }
 
-            taskInstr.innerText = `Platziere: ${displayTarget}`;
-            taskInstr.style.color = "#3b5bdb";
+            if (taskInstr) {
+                taskInstr.innerText = `Platziere die Note: ${displayTarget}`;
+                taskInstr.style.color = "#3b5bdb";
+            }
 
             currentNoteIndex = 7;
             placedNoteKey = notesToPractice[currentNoteIndex];
             drawNote(placedNoteKey, "q");
-        } else if (activeLevel === 5) {
-            // Level 5: Notenname -> Klaviertaste
-            confirmBtn.style.display = "none";
-            placementBtns.style.display = "none";
-            inputBtns.style.display = "none";
-            durationBtns.style.display = "none";
-            const pianoLarge = $id("piano-keyboard-large");
+        }
+        // ----------------- LEVEL 4: Notenname -> Klaviertaste
+        else if (activeLevel === 4) {
+            if (confirmBtn) confirmBtn.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "none";
+            if (inputBtns) inputBtns.style.display = "none";
             if (pianoLarge) pianoLarge.style.display = "none";
-            pianoKeyboard.style.display = "flex";
+            if (pianoKeyboard) pianoKeyboard.style.display = "flex";
 
             const rawNote = notenBeutel.next();
             const noteChar = rawNote.split('/')[0];
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
-            taskInstr.innerText = `Suche die Taste für: ${targetNoteLetter}`;
-            taskInstr.style.color = "#3b5bdb";
+            if (taskInstr) {
+                taskInstr.innerText = `Finde die Taste für: ${targetNoteLetter}`;
+                taskInstr.style.color = "#3b5bdb";
+            }
 
-            // Tastenfarbe zurücksetzen
             const keys = root.querySelectorAll('.piano-key');
             keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
 
-            drawNote(null); // Kein Notensystem nötig oder leer? Lass es leer.
-        } else if (activeLevel === 6) {
-            // Level 6: Note im System -> Klaviertaste
-            confirmBtn.style.display = "none";
-            placementBtns.style.display = "none";
-            inputBtns.style.display = "none";
-            durationBtns.style.display = "none";
-            const pianoLarge = $id("piano-keyboard-large");
+            drawNote(null);
+        }
+        // ----------------- LEVEL 5: Note im System -> Klaviertaste (1 Oktave)
+        else if (activeLevel === 5) {
+            if (confirmBtn) confirmBtn.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "none";
+            if (inputBtns) inputBtns.style.display = "none";
             if (pianoLarge) pianoLarge.style.display = "none";
-            pianoKeyboard.style.display = "flex";
+            if (pianoKeyboard) pianoKeyboard.style.display = "flex";
 
             currentNoteKey = notenBeutel.next();
             const noteChar = currentNoteKey.split('/')[0];
             targetNoteLetter = noteChar === "b" ? "H" : noteChar.toUpperCase();
 
-            taskInstr.innerText = "Drücke die entsprechende Taste";
-            taskInstr.style.color = "#3b5bdb";
-
-            // Tastenfarbe zurücksetzen
-            const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
-
-            drawNote(currentNoteKey, "q");
-        } else if (activeLevel === 7) {
-            // Level 7: Note im System -> Spezifische Klaviertaste (Oktave zählt!)
-            confirmBtn.style.display = "none";
-            placementBtns.style.display = "none";
-            inputBtns.style.display = "none";
-            durationBtns.style.display = "none";
-
-            const pianoNormal = $id("piano-keyboard");
-            const pianoLarge = $id("piano-keyboard-large");
-            pianoNormal.style.display = "none";
-            pianoLarge.style.display = "flex";
-
-            currentNoteKey = notenBeutel.next();
-
-            taskInstr.innerText = "Drücke die exakte Taste (auf die Oktave achten!)";
-            taskInstr.style.color = "#3b5bdb";
-
-            // Tastenfarbe zurücksetzen (alle Klaviaturen)
-            const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
-
-            drawNote(currentNoteKey, "q");
-        } else if (activeLevel === 4) {
-            confirmBtn.style.display = "none";
-            placementBtns.style.display = "none";
-            inputBtns.style.display = "none";
-            durationBtns.style.display = "flex";
-            const pianoLarge = $id("piano-keyboard-large");
-            if (pianoLarge) pianoLarge.style.display = "none";
-            pianoKeyboard.style.display = "none";
-
-            currentNoteKey = notenBeutel.next();
-            currentNoteDuration = durations[Math.floor(Math.random() * durations.length)];
-
-            taskInstr.innerText = "Welcher Notenwert ist das?";
-            taskInstr.style.color = "#333";
-            drawNote(currentNoteKey, currentNoteDuration);
-        } else {
-            confirmBtn.style.display = "none";
-            placementBtns.style.display = "none";
-            inputBtns.style.display = "flex";
-            durationBtns.style.display = "none";
-            const pianoLarge = $id("piano-keyboard-large");
-            if (pianoLarge) pianoLarge.style.display = "none";
-            pianoKeyboard.style.display = "none";
-
-            currentNoteKey = notenBeutel.next();
-            taskInstr.innerText = "Welche Note ist das?";
-            taskInstr.style.color = "#333";
-
-            currentNoteDuration = "q";
-            if (activeLevel === 2) {
-                currentNoteDuration = durations[Math.floor(Math.random() * durations.length)];
+            if (taskInstr) {
+                taskInstr.innerText = "Drücke die passende Klaviertaste für diese Note";
+                taskInstr.style.color = "#3b5bdb";
             }
-            drawNote(currentNoteKey, currentNoteDuration);
+
+            const keys = root.querySelectorAll('.piano-key');
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
+
+            drawNote(currentNoteKey, "q");
+        }
+        // ----------------- LEVEL 6 & LEVEL 8: Note im System -> Große Klaviatur (2 Oktaven)
+        else if (activeLevel === 6 || activeLevel === 8) {
+            if (confirmBtn) confirmBtn.style.display = "none";
+            if (placementBtns) placementBtns.style.display = "none";
+            if (inputBtns) inputBtns.style.display = "none";
+            if (pianoKeyboard) pianoKeyboard.style.display = "none";
+            if (pianoLarge) pianoLarge.style.display = "flex";
+
+            currentNoteKey = notenBeutel.next();
+
+            if (taskInstr) {
+                taskInstr.innerText = (activeLevel === 8) ? "Drücke die exakte Taste (10s Zeitlimit!)" : "Drücke die exakte Taste (auf die Oktave achten!)";
+                taskInstr.style.color = "#3b5bdb";
+            }
+
+            const keys = root.querySelectorAll('.piano-key');
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
+
+            drawNote(currentNoteKey, "q");
         }
 
-        // Output display handling
         const output = $id("output");
         if (output) {
-            output.style.display = (activeLevel === 5) ? "none" : "block";
+            output.style.display = (activeLevel === 4) ? "none" : "block";
+            output.classList.remove("interactive-staff");
         }
     }
-
-    function handleInput(clientX, clientY, isFinal) {
-        // Maus-Interaktion deaktiviert
-        return;
-    }
-
-    div.addEventListener("mousemove", function(e) { handleInput(e.clientX, e.clientY, false); });
-    div.addEventListener("click", function(e) { handleInput(e.clientX, e.clientY, true); });
-
-    // Touch-Support für Tablets
-    div.addEventListener("touchstart", function(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        handleInput(touch.clientX, touch.clientY, false);
-    }, {passive: false});
-
-    div.addEventListener("touchmove", function(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        handleInput(touch.clientX, touch.clientY, false);
-    }, {passive: false});
-
-    div.addEventListener("touchend", function(e) {
-        e.preventDefault();
-        const touch = e.changedTouches[0];
-        handleInput(touch.clientX, touch.clientY, true);
-    }, {passive: false});
 
     function confirmPlacement() {
         if (roundDone) return;
         let activeLv = currentLevel;
-        if (currentLevel === 8 || currentLevel === 9) {
+        if (currentLevel === 7) {
             activeLv = currentTaskLevel;
-            if (activeLv !== 3) return;
-        } else {
-            if (activeLv !== 3) return;
         }
+        if (activeLv !== 3) return;
         if (!placedNoteKey) return;
 
         isNoteLocked = true;
 
-        // Prüfe ob der gesetzte Notenname dem gesuchten entspricht
         if (placedNoteKey === targetNoteLetter) {
-            if (currentLevel === 8 || currentLevel === 9) stopTimer();
+            if (currentLevel === 7 || currentLevel === 8) stopTimer();
             drawNote(placedNoteKey, "q", 150, "#12b76a");
+            Core.sound.playNote(placedNoteKey, 0.8);
             handleCorrect();
         } else {
             drawNote(placedNoteKey, "q", 150, "#e5484d");
@@ -389,10 +368,6 @@
     }
 
     function handleCorrect() {
-        const feedback = $id("feedback");
-        feedback.innerText = "Korrekt!";
-        feedback.style.color = "#12b76a";
-
         if (!isCurrentRoundFailed) {
             score++;
             $id("score").innerText = score;
@@ -400,53 +375,86 @@
 
         roundCount++;
         roundDone = true;
-        showContinue();
-    }
-
-    /* Nach einer richtigen Loesung bleibt alles stehen, bis geklickt wird. */
-    function showContinue() {
-        ["input-buttons", "duration-buttons", "placement-buttons"].forEach(function (id) {
-            const e = $id(id);
-            if (e) e.style.display = "none";
-        });
-        const box = $id("continue");
-        if (!box) return;
-        box.innerHTML = "";
-        const b = document.createElement("button");
-        b.className = "continue-btn";
-        b.textContent = (roundCount >= totalRoundsForCurrentLevel) ? "Ergebnis anzeigen" : "Weiter";
-        b.addEventListener("click", nextRound);
-        box.appendChild(b);
-        box.style.display = "block";
+        updateProgressBar();
+        const btn = $id("continue-btn");
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = (roundCount >= totalRoundsForCurrentLevel ? "Ergebnis →" : "Weiter →");
+            btn.focus();
+        }
     }
 
     function handleWrong() {
-        const feedback = $id("feedback");
-        feedback.innerText = "Falsch!";
-        feedback.style.color = "#e5484d";
         isCurrentRoundFailed = true;
+        roundDone = false;
+        isNoteLocked = false;
+        const btn = $id("continue-btn");
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Erneut versuchen ↺";
+            btn.focus();
+        }
+    }
 
-        // Tastenfarbe bei Fehler nach kurzer Zeit zurücksetzen
-        setTimeout(() => {
-            const keys = root.querySelectorAll('.piano-key');
-            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
-
-            // Note wieder schwarz zeichnen
-            let activeLv = currentLevel;
-            if (currentLevel === 8 || currentLevel === 9) activeLv = currentTaskLevel;
-
-            if (activeLv === 3) {
-                drawNote(placedNoteKey, "q", 150, "black");
-                $id("btn-confirm").disabled = false;
-                $id("btn-confirm").innerText = "Bestätigen";
-            } else if (activeLv !== 5) {
-                drawNote(currentNoteKey, currentNoteDuration, 150, "black");
+    function onContinue() {
+        if (roundDone) {
+            if (roundCount >= totalRoundsForCurrentLevel) {
+                stopTimer();
+                showFinalResult();
+            } else {
+                nextRound();
             }
+        } else {
+            retryCurrent();
+            const btn = $id("continue-btn");
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "Weiter →";
+            }
+        }
+    }
 
-            isNoteLocked = false;
-            feedback.innerText = "Versuche es erneut...";
-            feedback.style.color = "#f59e0b"; // Orange für Wiederholung
-        }, 1200);
+    function retryCurrent() {
+        const modal = $id("feedbackModal");
+        if (modal) modal.style.display = "none";
+        roundDone = false;
+        isNoteLocked = false;
+
+        const keys = root.querySelectorAll('.piano-key');
+        keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
+
+        const allBtns = root.querySelectorAll("#n-input-buttons button, .answer-btn");
+        allBtns.forEach(b => b.classList.remove("wrong", "correct"));
+
+        let activeLv = currentLevel;
+        if (currentLevel === 7) activeLv = currentTaskLevel;
+
+        if (activeLv === 1 || activeLv === 2) {
+            const inputBtns = $id("input-buttons");
+            if (inputBtns) inputBtns.style.display = "flex";
+            drawNote(currentNoteKey, currentNoteDuration, 150, "black");
+        } else if (activeLv === 3) {
+            const placementBtns = $id("placement-buttons");
+            if (placementBtns) placementBtns.style.display = "flex";
+            const confirmBtn = $id("btn-confirm");
+            if (confirmBtn) {
+                confirmBtn.style.display = "block";
+                confirmBtn.disabled = false;
+                confirmBtn.innerText = "Bestätigen";
+            }
+            drawNote(placedNoteKey, "q", 150, "black");
+        } else if (activeLv === 4) {
+            const pianoKeyboard = $id("piano-keyboard");
+            if (pianoKeyboard) pianoKeyboard.style.display = "flex";
+        } else if (activeLv === 5) {
+            const pianoKeyboard = $id("piano-keyboard");
+            if (pianoKeyboard) pianoKeyboard.style.display = "flex";
+            drawNote(currentNoteKey, currentNoteDuration, 150, "black");
+        } else if (activeLv === 6 || activeLv === 8) {
+            const pianoLarge = $id("piano-keyboard-large");
+            if (pianoLarge) pianoLarge.style.display = "flex";
+            drawNote(currentNoteKey, currentNoteDuration, 150, "black");
+        }
     }
 
     function showFinalResult() {
@@ -458,8 +466,7 @@
         else if (percentage >= 50) grade = 4;
         else if (percentage >= 20) grade = 5;
 
-        const isSpecLevel = (currentLevel === 8 || currentLevel === 9);
-        const passed = isSpecLevel ? grade <= 2 : grade <= 3;
+        const passed = (currentLevel === 7 || currentLevel === 8) ? grade <= 2 : grade <= 3;
         const modal = $id("resultModal");
         modal.style.display = "flex";
 
@@ -470,55 +477,33 @@
             $id("modalTitle").innerText = "Level geschafft!";
             $id("modalGrade").style.color = "#12b76a";
 
-            if (isSpecLevel) {
-                if (subLevelIndex < 6) {
+            if (currentLevel === 7) {
+                if (subLevelIndex < 5) {
                     subLevelIndex++;
-                    $id("modalText").innerText = `Hervorragend! Weiter zur nächsten Stufe von Level ${currentLevel}.`;
+                    $id("modalText").innerText = `Hervorragend! Weiter zur nächsten Stufe von Level 7.`;
                     modal.dataset.nextAction = "next_stage";
                 } else {
                     subLevelIndex = 0;
-                    if (currentLevel === 8) {
-                        if (maxUnlockedLevel < 9) maxUnlockedLevel = 9;
-                        $id("modalText").innerText = "Grandios! Du hast den Level 8 Marathon abgeschlossen. Level 9 ist nun bereit.";
-                        modal.dataset.nextAction = "next";
-                    } else {
-                        $id("modalText").innerText = "Ultimativ! Du hast den Level 9 Marathon gemeistert!";
-                        modal.dataset.nextAction = "complete_all";
-                    }
-                }
-            } else {
-                // Logik für Freischaltung (Speicherung entfernt)
-                if (currentLevel === 4) { // Level 1 -> schaltet Level 2 (ID 1) frei
-                    if (maxUnlockedLevel < 1) maxUnlockedLevel = 1;
-                    $id("modalText").innerText = "Hervorragend! Level 2 ist nun freigeschaltet.";
-                    modal.dataset.nextAction = "next_special";
-                } else if (currentLevel === 1) { // Level 2 -> schaltet Level 3 (ID 2) frei
-                    if (maxUnlockedLevel < 2) maxUnlockedLevel = 2;
-                    $id("modalText").innerText = "Hervorragend! Level 3 ist nun freigeschaltet.";
-                    modal.dataset.nextAction = "next";
-                } else if (currentLevel === 2) { // Level 3 -> schaltet Level 4 (ID 3) frei
-                    if (maxUnlockedLevel < 3) maxUnlockedLevel = 3;
-                    $id("modalText").innerText = "Hervorragend! Level 4 ist nun freigeschaltet.";
-                    modal.dataset.nextAction = "next";
-                } else if (currentLevel === 7) {
                     if (maxUnlockedLevel < 8) maxUnlockedLevel = 8;
-                    $id("modalText").innerText = "Hervorragend! Level 8 ist nun freigeschaltet.";
-                    modal.dataset.nextAction = "next";
-                } else if (currentLevel < 7) {
-                    if (maxUnlockedLevel <= currentLevel) {
-                        if (currentLevel === 3) maxUnlockedLevel = 5; // Level 4 -> Level 5
-                        else maxUnlockedLevel = currentLevel + 1;
-                    }
-                    $id("modalText").innerText = "Hervorragend! Das nächste Level ist freigeschaltet.";
+                    $id("modalText").innerText = "Grandios! Du hast die Tempo-Challenge abgeschlossen. Level 8 ist nun bereit.";
                     modal.dataset.nextAction = "next";
                 }
+            } else if (currentLevel === 8) {
+                $id("modalText").innerText = "Ultimativ! Du hast die Meister-Klaviatur mit Bestnote gemeistert!";
+                modal.dataset.nextAction = "complete_all";
+            } else {
+                if (maxUnlockedLevel < currentLevel + 1) {
+                    maxUnlockedLevel = currentLevel + 1;
+                }
+                $id("modalText").innerText = `Hervorragend! Level ${currentLevel + 1} ist nun freigeschaltet.`;
+                modal.dataset.nextAction = "next";
             }
         } else {
             $id("modalTitle").innerText = "Nicht bestanden";
             $id("modalGrade").style.color = "#e5484d";
 
-            let req = isSpecLevel ? "Note 2" : "Note 3";
-            $id("modalText").innerText = `Wiederhole das Level für eine bessere Note (mind. ${req}).`;
+            let req = (currentLevel === 7 || currentLevel === 8) ? "Note 2" : "Note 3";
+            $id("modalText").innerText = `Wiederhole das Level für eine bessere Note (mindestens ${req}).`;
             modal.dataset.nextAction = "repeat";
         }
     }
@@ -527,54 +512,44 @@
         $id("resultModal").style.display = "none";
         const action = $id("resultModal").dataset.nextAction;
 
-        // Reihenfolge der Level-IDs für linearen Fortschritt:
-        // Level 1(4), 2(1), 3(2), 4(3), 5(5), 6(6), 7(7), 8(8), 9(9)
-        const levelSequence = [4, 1, 2, 3, 5, 6, 7, 8, 9];
-        const currentIndex = levelSequence.indexOf(currentLevel);
-
-        if (action === "next" || action === "next_special" || action === "next_to_5") {
-            if (currentIndex !== -1 && currentIndex < levelSequence.length - 1) {
-                setLevel(levelSequence[currentIndex + 1]);
+        if (action === "next") {
+            if (currentLevel < 8) {
+                setLevel(currentLevel + 1);
             } else {
-                setLevel(4);
+                setLevel(1);
             }
+        } else if (action === "next_stage") {
+            setLevel(currentLevel);
+        } else if (action === "repeat") {
+            setLevel(currentLevel);
+        } else {
+            setLevel(1);
         }
-        else if (action === "next_stage") setLevel(currentLevel);
-        else if (action === "repeat") setLevel(currentLevel);
-        else if (action === "complete_all") setLevel(4);
-        else setLevel(4);
     }
 
-    function checkAnswer(guess) {
+    function checkAnswer(guess, btn) {
         if (roundDone) return;
-        if (currentLevel === 3 || currentLevel === 4) return;
-        if (currentLevel === 8 || currentLevel === 9) {
-            if (currentTaskLevel === 3 || currentTaskLevel === 4) return;
+        let activeLv = currentLevel;
+        if (currentLevel === 7) {
+            activeLv = currentTaskLevel;
         }
+        if (activeLv !== 1 && activeLv !== 2) return;
+
+        if (!btn && typeof event !== 'undefined' && event && event.target) btn = event.target;
+
         let noteLetter = currentNoteKey.split('/')[0];
         let expected = noteLetter === 'b' ? 'H' : noteLetter.toUpperCase();
-        if (guess === expected) {
-            if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#12b76a");
-            handleCorrect();
-        } else {
-            drawNote(currentNoteKey, currentNoteDuration, 150, "#e5484d");
-            handleWrong();
-        }
-    }
 
-    function checkDuration(guess) {
-        if (roundDone) return;
-        if (currentLevel === 8 || currentLevel === 9) {
-            if (currentTaskLevel !== 4) return;
-        } else {
-            if (currentLevel !== 4) return;
-        }
-        if (guess === currentNoteDuration) {
-            if (currentLevel === 8 || currentLevel === 9) stopTimer();
+        const allBtns = root.querySelectorAll("#n-input-buttons button");
+
+        if (guess === expected) {
+            if (currentLevel === 7 || currentLevel === 8) stopTimer();
+            allBtns.forEach(b => b.classList.remove("wrong", "correct"));
+            if (btn) btn.classList.add("correct");
             drawNote(currentNoteKey, currentNoteDuration, 150, "#12b76a");
             handleCorrect();
         } else {
+            if (btn) btn.classList.add("wrong");
             drawNote(currentNoteKey, currentNoteDuration, 150, "#e5484d");
             handleWrong();
         }
@@ -583,30 +558,41 @@
     function checkPianoKey(guess, element) {
         if (roundDone) return;
         let activeLv = currentLevel;
-        if (currentLevel === 8 || currentLevel === 9) {
+        if (currentLevel === 7) {
             activeLv = currentTaskLevel;
-            if (activeLv !== 5 && activeLv !== 6 && activeLv !== 7) return;
+        }
+        if (activeLv !== 4 && activeLv !== 5 && activeLv !== 6 && activeLv !== 8) return;
+
+        // Ton auf Klaviertaste sofort spielen
+        if (activeLv === 6 || activeLv === 8) {
+            Core.sound.playNote(guess, 0.7);
         } else {
-            if (activeLv !== 5 && activeLv !== 6 && activeLv !== 7) return;
+            const keyGuess = (guess === 'H' ? 'b' : guess.toLowerCase()) + "/4";
+            Core.sound.playNote(keyGuess, 0.7);
         }
 
         let isCorrect = false;
-        if (activeLv === 7) {
+        if (activeLv === 6 || activeLv === 8) {
             isCorrect = (guess === currentNoteKey);
         } else {
             isCorrect = (guess === targetNoteLetter);
         }
 
+        const keys = root.querySelectorAll('.piano-key');
+
         if (isCorrect) {
-            if (currentLevel === 8 || currentLevel === 9) stopTimer();
-            element.style.background = "#12b76a"; element.style.color = "#fff"; // Grün bei Erfolg
-            if (activeLv === 6 || activeLv === 7) {
+            if (currentLevel === 7 || currentLevel === 8) stopTimer();
+            keys.forEach(k => { k.style.background = ''; k.style.color = ''; });
+            element.style.background = "#12b76a";
+            element.style.color = "#fff";
+            if (activeLv === 5 || activeLv === 6 || activeLv === 8) {
                 drawNote(currentNoteKey, "q", 150, "#12b76a");
             }
             handleCorrect();
         } else {
-            element.style.background = "#e5484d"; element.style.color = "#fff"; // Rot bei Fehler
-            if (activeLv === 6 || activeLv === 7) {
+            element.style.background = "#e5484d";
+            element.style.color = "#fff";
+            if (activeLv === 5 || activeLv === 6 || activeLv === 8) {
                 drawNote(currentNoteKey, "q", 150, "#e5484d");
             }
             handleWrong();
@@ -615,17 +601,13 @@
 
     function cancelLevel() {
         subLevelIndex = 0;
-        setLevel(4);
+        setLevel(1);
     }
 
     function setLevel(lvl) {
-        // Sicherstellen, dass das Level existiert und valide ist
-        if (lvl === undefined || lvl === null) lvl = 4;
+        if (lvl === undefined || lvl === null) lvl = 1;
 
-        // Spezialfall: Level 1 (ID 4) ist immer frei
-        const isInitialLevel = (lvl === 4);
-
-        if (!isInitialLevel && lvl > maxUnlockedLevel) {
+        if (lvl > 1 && lvl > maxUnlockedLevel) {
             $id("lockModal").style.display = "flex";
             return;
         }
@@ -633,64 +615,64 @@
         currentLevel = lvl;
         stopTimer();
 
-        // Buttons für Platzierung (Level 4, ID 3) nur dann anzeigen
         const placementBtns = $id("placement-buttons");
         if (placementBtns) {
             placementBtns.style.display = (lvl === 3) ? "flex" : "none";
         }
 
-        totalRoundsForCurrentLevel = (lvl === 8 || lvl === 9) ? 10 : 20;
+        totalRoundsForCurrentLevel = (lvl === 7) ? 10 : 20;
 
-        // Klaviaturen
         const pianoNormal = $id("piano-keyboard");
         const pianoLarge = $id("piano-keyboard-large");
 
-        // Aktives Level bestimmen (Marathon oder Normal)
-        const levels = [4, 1, 2, 3, 5, 6, 7];
         let activeLv = lvl;
-        if (lvl === 8 || lvl === 9) {
-            activeLv = levels[subLevelIndex];
+        if (lvl === 7) {
+            const levels = [1, 2, 3, 4, 5, 6];
+            activeLv = levels[subLevelIndex % levels.length];
+        } else if (lvl === 8) {
+            activeLv = 8;
         }
 
-        if (pianoNormal) pianoNormal.style.display = (activeLv === 5 || activeLv === 6) ? "flex" : "none";
-        if (pianoLarge) pianoLarge.style.display = (activeLv === 7) ? "flex" : "none";
+        if (pianoNormal) pianoNormal.style.display = (activeLv === 4 || activeLv === 5) ? "flex" : "none";
+        if (pianoLarge) pianoLarge.style.display = (activeLv === 6 || activeLv === 8) ? "flex" : "none";
 
-        // Notenausgabe ausblenden für Level 5
         const output = $id("output");
         if (output) {
-            output.style.display = (activeLv === 5) ? "none" : "block";
+            output.style.display = (activeLv === 4) ? "none" : "block";
+            output.classList.remove("interactive-staff");
         }
 
-        // Buttons stylen (Highlighting)
-        const isMarathon = (lvl === 8 || lvl === 9);
+        const isTimed = (lvl === 7 || lvl === 8);
         const cancelBtn = $id("btn-cancel");
-        if (cancelBtn) cancelBtn.style.display = isMarathon ? "inline-block" : "none";
+        if (cancelBtn) cancelBtn.style.display = isTimed ? "inline-block" : "none";
 
-        for (let i of [4, 1, 2, 3, 5, 6, 7, 8, 9]) {
-            const btn = $id(`btn-lvl${i}`);
+        for (let i = 1; i <= 8; i++) {
+            const btn = $id(`n-btn-lvl${i}`) || $id(`btn-lvl${i}`);
             if (btn) {
-                const isLocked = (i !== 4 && i > maxUnlockedLevel);
-                btn.className = isLocked ? "lvl-locked" : "";
-                btn.style.background = (i === currentLevel) ? "#12b76a" : (isLocked ? "#98a2b3" : "#3b5bdb");
+                const isLocked = (i > maxUnlockedLevel);
+                btn.className = isLocked ? "lvl-locked" : (i === currentLevel ? "active" : "");
+                btn.style.background = "";
+                btn.style.color = "";
+                btn.style.borderColor = "";
 
-                // Während Marathon andere Buttons sperren
-                if (isMarathon && i !== lvl) {
+                if (isTimed && i !== lvl) {
                     btn.disabled = true;
                     btn.style.opacity = "0.5";
                     btn.style.cursor = "not-allowed";
                 } else {
                     btn.disabled = false;
-                    btn.style.opacity = "1";
-                    btn.style.cursor = "pointer";
+                    btn.style.opacity = "";
+                    btn.style.cursor = "";
                 }
             }
         }
 
         score = 0;
         roundCount = 0;
-        recentNotes = [];
+        basicBeutel.neu();
         notenBeutel.neu();
         $id("score").innerText = "0";
+        updateProgressBar();
         nextRound();
     }
 
@@ -710,13 +692,13 @@
     function checkUnlockPassword() {
         const pw = $id("unlockPassword").value;
         if (pw === "Musikunterricht") {
-            maxUnlockedLevel = 9;
+            maxUnlockedLevel = 8;
             setLevel(currentLevel);
-            showUnlockSuccess("Alle Level wurden freigeschaltet!");
+            $id("unlockModal").style.display = "none";
         } else if (pw === "Klaviatur") {
             maxUnlockedLevel = 5;
             setLevel(currentLevel);
-            showUnlockSuccess("Level 1 bis 5 wurden freigeschaltet!");
+            $id("unlockModal").style.display = "none";
         } else {
             $id("unlockTitle").innerText = "Falsches Passwort!";
             $id("unlockTitle").style.color = "#e5484d";
@@ -737,21 +719,21 @@
         $id("unlockCloseBtn").style.display = "block";
     }
 
-    // Modul öffnen: beim ersten Mal auf VexFlow warten, danach aktuelles Level neu starten
     function open() {
         if (!started) {
             started = true;
-            whenVexReady($id("error-display"), () => setLevel(4)); // Startet mit Level 1 (ID 4)
+            whenVexReady($id("error-display"), () => setLevel(1));
         } else {
             setLevel(currentLevel);
         }
     }
 
-    // Beim Verlassen des Moduls Timer anhalten
     function suspend() {
         stopTimer();
     }
 
-    return { open, suspend, setLevel, cancelLevel, unlockAllLevels, checkUnlockPassword,
-             checkAnswer, checkDuration, checkPianoKey, moveNote, confirmPlacement, closeModal };
-    })();
+    return {
+        open, suspend, setLevel, cancelLevel, unlockAllLevels, checkUnlockPassword,
+        checkAnswer, checkPianoKey, moveNote, confirmPlacement, closeModal, onContinue, retryCurrent
+    };
+})();

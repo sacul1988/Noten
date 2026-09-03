@@ -1,317 +1,1103 @@
 /* ===========================================================================
-   Musik-Trainer — gemeinsames Stylesheet
+   Musik-Trainer — Stylesheet
+   Didaktisch optimiert für Schülerinnen und Schüler auf iPads im Unterricht
+   Vollbild, ausgewogene visuelle Hierarchie und responsive Aufteilung
    ========================================================================= */
 
 :root {
-    --akzent:        #3b5bdb;
-    --akzent-dunkel: #364fc7;
-    --akzent-hell:   #eef2ff;
-    --erfolg:        #12b76a;
-    --erfolg-dunkel: #0e9355;
-    --fehler:        #e5484d;
-    --text:          #101828;
-    --text-leise:    #667085;
-    --rand:          #e4e7ec;
+    --akzent:        #3b82f6;
+    --akzent-dunkel: #2563eb;
+    --akzent-3d:     #1d4ed8;
+    --akzent-hell:   #eff6ff;
+    --erfolg:        #16a34a;
+    --erfolg-dunkel: #15803d;
+    --erfolg-3d:     #166534;
+    --fehler:        #ef4444;
+    --fehler-dunkel: #dc2626;
+    --fehler-3d:     #b91c1c;
+    --text:          #0f172a;
+    --text-leise:    #475569;
+    --rand:          #e2e8f0;
     --flaeche:       #ffffff;
-    --hintergrund:   #f5f7fa;
-    --radius:        14px;
-    --schatten:      0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .06);
+    --hintergrund:   #f1f5f9;
+    --radius:        20px;
+    --schatten-card: 0 12px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background: #f1f5f9;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+}
 
 body {
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: var(--hintergrund);
-    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-height: 100vh;
+    background: #f1f5f9;
+}
+
+/* ----------------------------------------------- Abgesetztes Vollbild-Feld mit Randabstand */
+
+.container {
+    width: 100%;
+    min-height: 100vh;
+    max-width: 100%;
+    margin: 0;
+    padding: 16px;
+    background: #f1f5f9;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 32px 16px 48px;
-    touch-action: manipulation;
-    -webkit-font-smoothing: antialiased;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    position: relative;
+    flex: 1;
 }
 
-.container {
-    background: var(--flaeche);
-    padding: 28px 28px 32px;
-    border: 1px solid var(--rand);
-    border-radius: 20px;
-    box-shadow: var(--schatten);
-    text-align: center;
+.exercise-card {
     width: 100%;
-    max-width: 960px;
+    max-width: 100%;
+    min-height: calc(100vh - 32px);
+    background: #ffffff;
+    border-radius: 24px;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
+    padding: 28px 28px 32px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-h1, h2 { color: var(--text); letter-spacing: -0.01em; }
+h1, h2, h3 {
+    color: var(--text);
+    letter-spacing: -0.02em;
+}
 
 /* ------------------------------------------------------------- Buttons */
 
 button {
     font-family: inherit;
-    font-weight: 600;
-    padding: 12px 18px;
-    flex: 1;
-    min-width: 70px;
-    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 12px 22px;
+    min-height: 48px;
+    font-size: 1.05rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 14px;
     background: var(--akzent);
     color: #fff;
     cursor: pointer;
-    transition: background .15s ease, transform .1s ease, box-shadow .15s ease;
-    -webkit-tap-highlight-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
 }
-button:hover { background: var(--akzent-dunkel); }
-button:active { transform: translateY(1px); }
-button:disabled { background: #d0d5dd !important; cursor: not-allowed !important; opacity: .7 !important; }
+button:disabled { background: #cbd5e1 !important; cursor: not-allowed !important; opacity: .7 !important; transform: none !important; box-shadow: none !important; }
 
-.btn-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 22px; width: 100%; }
+/* --------------------------------------------------------- Level-Leiste & Exit-Button */
 
-/* --------------------------------------------------------- Kopfbereich */
-
-.module-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.module-header h2 { margin: 0; font-size: 1.5rem; }
-.header-spacer { width: 92px; }
-
-.menu-btn {
-    flex: none; min-width: auto; padding: 8px 16px; font-size: .9rem;
-    background: var(--flaeche); color: var(--text-leise);
-    border: 1px solid var(--rand); border-radius: 9px;
+.lvl-bar {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: static;
+    min-height: 44px;
 }
-.menu-btn:hover { background: var(--hintergrund); color: var(--text); border-color: #d0d5dd; }
-
-.score-board { font-size: 1rem; color: var(--text-leise); margin-bottom: 18px; }
-
-.lvl-btns { margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.exit-btn {
+    position: absolute;
+    left: 22px;
+    top: 22px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #cbd5e1;
+    background: var(--flaeche);
+    color: var(--text-leise);
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+    flex-shrink: 0;
+    padding: 0;
+    min-height: auto;
+    z-index: 20;
+}
+.exit-btn:hover, .exit-btn:active {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+    transform: scale(0.95);
+}
+.lvl-btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+}
 .lvl-btns button {
-    padding: 8px 15px; font-size: .9rem; font-weight: 600;
-    flex: none; min-width: auto; border-radius: 999px;
+    padding: 7px 14px;
+    min-height: 36px;
+    font-size: .88rem;
+    font-weight: 700;
+    flex: none;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    cursor: pointer;
+    transition: all .15s ease;
 }
-.lvl-locked { opacity: .55; cursor: not-allowed !important; }
-.unlock-btn { background: var(--flaeche) !important; color: var(--text-leise) !important;
-              border: 1px solid var(--rand); font-size: .85rem !important; padding: 8px 14px !important; }
-.unlock-btn:hover { background: var(--hintergrund) !important; color: var(--text) !important; }
+.lvl-btns button:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: var(--text);
+}
+.lvl-btns button.active {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+}
+.lvl-btns button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.lvl-btns button.lvl-locked {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+    opacity: 0.7;
+    cursor: pointer;
+}
+.lvl-btns button.unlock-btn {
+    border: 1.5px dashed #cbd5e1;
+    background: transparent;
+    color: #64748b;
+}
+.lvl-btns button.unlock-btn:hover {
+    border-color: #94a3b8;
+    color: var(--text);
+    background: #f8fafc;
+}
+
+/* --------------------------------------------------------- Fokus-Header (Fortschrittsbalken) */
+
+.fokus-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto 20px;
+}
+
+.progress-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.progress-wrap {
+    width: 100%;
+    height: 14px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+    border-radius: 999px;
+    transition: width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.round-counter {
+    display: none !important;
+}
+
+.star-badge {
+    display: none !important;
+}
+.star-icon {
+    color: #f59e0b;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+/* --------------------------------------------------- Hauptarbeitsfläche */
+
+.module-stage {
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.note-output, .staff-box {
+    width: 100%;
+    max-width: 760px;
+    height: 175px;
+    margin: 0 auto 20px;
+    background: var(--flaeche);
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+.note-output {
+    cursor: default;
+    touch-action: none;
+}
+.staff-box svg, .note-output svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.error-note {
+    color: var(--fehler);
+    font-size: .85rem;
+    margin: 4px;
+    display: none;
+}
+
+.task-box {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto 20px;
+    text-align: center;
+}
+.task-text {
+    font-weight: 800;
+    font-size: 1.45rem;
+    margin: 0 auto;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.35;
+}
+#n-task-instruction, #v-feedback {
+    font-weight: 800;
+    font-size: 1.45rem;
+    margin: 0 auto;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.35;
+}
+
+/* Tipps & Merkhilfen in alten Modulen ausblenden */
+.fokus-hint, .opt-tip, #n-task-hint, #v-task-hint, .rule-box {
+    display: none !important;
+}
+
+.hint-box {
+    margin: 0 auto 8px auto;
+    text-align: center;
+}
+
+.feedback-text, #n-feedback {
+    font-weight: 700;
+    min-height: 28px;
+    font-size: 1.15rem;
+    margin: 4px auto;
+    text-align: center;
+}
+
+.round-info, #n-round-info, #v-round-info {
+    display: none; /* jetzt im Fokus-Header integriert */
+}
+
+/* Schrittschema der Tonleitern */
+.step-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.step-chain b {
+    margin-right: 4px;
+    color: #1e3a8a;
+}
+.step {
+    padding: 4px 11px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #dbe2fe;
+    color: #1e3a8a;
+    font-size: .88rem;
+    font-weight: 600;
+}
+.step-active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+    color: #fff;
+    font-weight: 700;
+}
+.step-arrow {
+    color: #94a3b8;
+    font-size: .88rem;
+}
+
+/* ------------------------------------------------ Interaktions-Zone: Plastische 3D-Kacheln */
+
+.interactive-area {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 0;
+}
+.interactive-area > *:empty {
+    display: none;
+}
+
+.btn-grid, .answer-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 960px;
+    padding-bottom: 0;
+}
+.answer-btn, .btn-grid button {
+    flex: 0 1 auto;
+    min-width: 48px;
+    min-height: 40px;
+    padding: 8px 14px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    border-radius: 11px;
+    background: var(--akzent);
+    color: #ffffff;
+    box-shadow: 0 3px 0 var(--akzent-3d);
+    transform: translateY(0);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+.answer-btn:hover, .btn-grid button:hover {
+    background: var(--akzent-dunkel);
+}
+.answer-btn:active, .answer-btn.tapped, .btn-grid button:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--akzent-3d);
+}
+.answer-btn.correct {
+    background: var(--erfolg) !important;
+    box-shadow: 0 3px 0 var(--erfolg-3d) !important;
+}
+.answer-btn.wrong {
+    background: var(--fehler) !important;
+    box-shadow: 0 3px 0 var(--fehler-3d) !important;
+    animation: shake 0.35s ease;
+}
+
+.answer-grid.dense {
+    gap: 6px;
+}
+.answer-grid.dense .answer-btn, .btn-grid .dense-btn {
+    min-width: 44px;
+    min-height: 36px;
+    padding: 6px 10px;
+    font-size: 0.88rem;
+    box-shadow: 0 2px 0 var(--akzent-3d);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+}
+
+/* ------------------------------------------------ Feedback-Drawer (Ausgeblendet, da durch Popup ersetzt) */
+
+.feedback-drawer {
+    display: none !important;
+}
+
+/* ------------------------------------------------ Kompaktes Feedback-Popup (Modal) */
+
+.feedback-drawer {
+    display: none !important;
+}
+.js-feedback-modal, #n-feedbackModal, #v-feedbackModal, #feedbackModal {
+    display: none !important;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.48);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 38px 32px 32px;
+    border-radius: 28px;
+    text-align: center;
+    box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    max-width: 100%;
+    width: 440px;
+    position: relative;
+    box-sizing: border-box;
+    animation: modalPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bottom-action-bar {
+    position: static;
+    margin: 20px auto 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 20;
+}
+.cancel-btn {
+    min-width: 110px;
+    min-height: 40px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 3px 0 #b91c1c, 0 6px 14px rgba(220, 38, 38, 0.2);
+    color: #ffffff;
+    transition: transform .08s ease, box-shadow .08s ease, filter .15s ease;
+}
+.cancel-btn:hover {
+    filter: brightness(1.08);
+}
+.cancel-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #b91c1c;
+}
+.confirm-btn {
+    min-width: 110px;
+    min-height: 40px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 3px 0 #1d4ed8, 0 6px 14px rgba(37, 99, 235, 0.2);
+    color: #ffffff;
+    transition: transform .08s ease, box-shadow .08s ease, filter .15s ease, background .15s ease, opacity .15s ease;
+}
+.confirm-btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+.confirm-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #1d4ed8;
+}
+.confirm-btn:disabled {
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.65 !important;
+    transform: none !important;
+    pointer-events: none;
+}
+.continue-btn {
+    min-width: 110px;
+    min-height: 40px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border-radius: 12px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    box-shadow: 0 3px 0 #15803d, 0 6px 14px rgba(22, 163, 74, 0.2);
+    color: #ffffff;
+    transition: transform .08s ease, box-shadow .08s ease, filter .15s ease, background .15s ease, opacity .15s ease;
+}
+
+.staff-stage-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.staff-stage-wrap .note-output,
+.staff-stage-wrap .staff-box {
+    margin: 0 auto;
+}
+.timer-badge-left {
+    position: absolute;
+    right: calc(100% + 20px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ffffff;
+    border: 2px solid #ef4444;
+    color: #dc2626;
+    font-size: 1.15rem;
+    font-weight: 800;
+    padding: 10px 18px;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+    white-space: nowrap;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+@media (max-width: 1050px) {
+    .timer-badge-left {
+        position: static;
+        transform: none;
+        margin-bottom: 12px;
+    }
+    .staff-stage-wrap {
+        flex-direction: column;
+    }
+}
+.continue-btn:hover:not(:disabled) {
+    filter: brightness(1.06);
+}
+.continue-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #15803d;
+}
+.continue-btn:disabled {
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    opacity: 0.65 !important;
+    transform: none !important;
+    pointer-events: none;
+}
+
+.modal-btn {
+    padding: 14px 28px;
+    min-height: 52px;
+    border-radius: 16px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+    transform: translateY(0);
+    transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.15s ease;
+}
+.modal-btn:hover {
+    filter: brightness(1.05);
+}
+.modal-btn:active {
+    transform: translateY(3px);
+}
+
+.modal-btn.success-btn {
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 0 #15803d, 0 8px 16px rgba(22, 163, 74, 0.25) !important;
+}
+.modal-btn.success-btn:active {
+    box-shadow: 0 1px 0 #15803d !important;
+}
+
+.modal-btn.retry-btn {
+    background: linear-gradient(180deg, #fb923c 0%, #ea580c 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 0 #c2410c, 0 8px 16px rgba(234, 88, 12, 0.25) !important;
+}
+.modal-btn.retry-btn:active {
+    box-shadow: 0 1px 0 #c2410c !important;
+}
+
+/* ---------------------------------------------------------- Klaviatur */
+
+.piano-container {
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    user-select: none;
+    -webkit-user-select: none;
+    max-width: 100%;
+    touch-action: manipulation;
+    padding-bottom: 0;
+    position: relative;
+}
+.piano-container:has(.key-remove-btn) {
+    padding-bottom: 54px;
+}
+.piano-key {
+    width: 44px;
+    height: 124px;
+    border: 1px solid #cbd5e1;
+    border-top: 1px solid #cbd5e1;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 85%, #f1f5f9 100%);
+    border-radius: 0 0 7px 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    font-weight: 700;
+    font-size: .9rem;
+    color: var(--text-leise);
+    position: relative;
+    z-index: 1;
+    margin-right: -1px;
+    transition: background .1s ease, transform .08s ease;
+    box-shadow: 0 2px 5px rgba(16, 24, 40, .06);
+    touch-action: manipulation;
+}
+.piano-key:active {
+    background: #e2e8f0;
+    transform: scaleY(0.99);
+}
+.piano-key.black {
+    width: 28px;
+    height: 76px;
+    margin-left: -14px;
+    margin-right: -14px;
+    z-index: 2;
+    background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
+    border: 1px solid #0f172a;
+    border-top: 1px solid #0f172a;
+    color: #fff;
+    border-radius: 0 0 5px 5px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(16, 24, 40, .3);
+}
+.piano-key.black:active {
+    background: #475569;
+}
+.key-remove-btn {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    cursor: pointer;
+    z-index: 20;
+    pointer-events: auto;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+/* Senkrechter Verlängerungsstrich von der Taste zum X */
+.key-remove-btn::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 10px;
+    background: #3b82f6;
+    border-radius: 1px;
+    pointer-events: none;
+}
+.key-remove-btn:hover {
+    transform: translateX(-50%) scale(1.18);
+    background: #dc2626;
+}
+/* Für schwarze Tasten: Längere Verlängerung tiefer unter die Klaviatur */
+.piano-key.black .key-remove-btn {
+    bottom: -54px;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    border: none;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    z-index: 25;
+}
+.piano-key.black .key-remove-btn::before {
+    top: -40px;
+    height: 40px;
+    width: 2px;
+    background: #3b82f6;
+}
+#module-noten .piano-key.black {
+    cursor: default;
+}
+
+/* Große Klaviatur */
+.piano-container.large, .piano-container.wide {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: visible;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 6px 0;
+}
+.piano-container.large:has(.key-remove-btn), .piano-container.wide:has(.key-remove-btn) {
+    padding-bottom: 54px;
+}
+.piano-container.wide {
+    display: none;
+}
+.piano-container.large .piano-key, .piano-container.wide .piano-key {
+    flex: none;
+    width: 42px;
+    height: 128px;
+}
+.piano-container.large .piano-key.black, .piano-container.wide .piano-key.black {
+    width: 26px;
+    height: 80px;
+    margin-left: -13px;
+    margin-right: -13px;
+}
 
 /* ---------------------------------------------------------- Startmenü */
 
-.menu-page { padding: 0 0 34px; overflow: hidden; }
+.menu-page {
+    padding: 0 0 36px;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+}
 
-/* Kopfbereich mit angedeutetem Notensystem als Hintergrund */
 .hero {
     position: relative;
-    padding: 54px 24px 46px;
-    background: linear-gradient(160deg, #f7f9ff 0%, #eef2ff 55%, #f5f3ff 100%);
-    border-bottom: 1px solid var(--rand);
-}
-.hero-staff {
-    position: absolute; inset: 0; pointer-events: none;
-    background: repeating-linear-gradient(to bottom,
-        transparent 0 17px, rgba(59, 91, 219, .5) 17px 18.5px);
-    background-position: 0 calc(50% - 34px);
-    background-size: 100% 92px;
-    background-repeat: no-repeat;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-    mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+    width: 100%;
+    padding: 40px 24px 10px;
+    background: #f1f5f9;
+    border-bottom: none;
+    text-align: center;
+    box-sizing: border-box;
 }
 .hero h1 {
-    position: relative; margin: 0; font-size: 2.6rem; font-weight: 800;
-    letter-spacing: -.02em; color: #1b2559;
-    text-shadow: 0 0 18px #eef2ff, 0 0 34px #eef2ff, 0 0 8px #eef2ff;
-}
-.hero-sub {
-    position: relative; margin: 12px auto 0; max-width: 460px;
-    color: #5a6396; font-size: 1.02rem; line-height: 1.5;
-    text-shadow: 0 0 14px #eef2ff, 0 0 26px #eef2ff;
+    position: relative;
+    margin: 0;
+    font-size: clamp(2.4rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    color: #1b2559;
 }
 
+/* 6 Modulkarten: Ausgewogene, moderne Dashboard-Karten */
 .menu-cards {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 16px; padding: 30px 28px 0;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 32px 28px 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    box-sizing: border-box;
+    flex: 1;
 }
+@media (min-width: 620px) and (max-width: 959px) {
+    .menu-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        padding: 24px 20px 36px;
+    }
+}
+@media (min-width: 960px) {
+    .menu-cards {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        padding: 36px 32px 48px;
+    }
+}
+
 .menu-card {
-    position: relative; overflow: hidden;
-    background: var(--flaeche); color: var(--text);
-    border: 1px solid var(--rand); border-radius: var(--radius);
-    padding: 22px 20px 20px 24px; text-align: left; cursor: pointer;
-    flex: none; min-width: 0; font-size: 1rem;
-    display: flex; flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: var(--flaeche);
+    color: var(--text);
+    border: 1px solid var(--rand);
+    border-radius: var(--radius);
+    padding: 26px 24px 22px 28px;
+    text-align: left;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+    min-height: 155px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    box-shadow: 0 2px 6px rgba(16, 24, 40, .04);
 }
-/* Farbiger Streifen links, der beim Überfahren aufgeht */
 .menu-card::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
     background: var(--modul, var(--akzent));
     transition: width .18s ease;
 }
-/* Die Karte ist ein <button>. Ohne diese Zeilen färbt die allgemeine
-   Button-Regel sie beim Überfahren voll ein und der Text verschwindet. */
 .menu-card, .menu-card:hover, .menu-card:focus, .menu-card:active {
     background: var(--flaeche);
     color: var(--text);
 }
 .menu-card:hover {
     border-color: var(--modul, var(--akzent));
-    box-shadow: 0 10px 26px rgba(16, 24, 40, .10);
+    box-shadow: 0 12px 28px rgba(16, 24, 40, .09);
     transform: translateY(-3px);
 }
-.menu-card:active { transform: translateY(-1px); }
-.menu-card:focus-visible { outline: 2px solid var(--modul, var(--akzent)); outline-offset: 3px; }
-.menu-card:hover::before { width: 7px; }
+.menu-card:active {
+    transform: translateY(-1px) scale(0.99);
+}
+.menu-card:focus-visible {
+    outline: 2px solid var(--modul, var(--akzent));
+    outline-offset: 3px;
+}
+.menu-card:hover::before {
+    width: 10px;
+}
 
 .card-num {
-    position: absolute; top: 12px; right: 16px;
-    font-size: 2.4rem; font-weight: 800; line-height: 1;
-    color: var(--modul, var(--akzent)); opacity: .13; letter-spacing: -.03em;
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--modul, var(--akzent));
+    opacity: .13;
+    letter-spacing: -.03em;
 }
 .card-title {
-    font-size: 1.2rem; font-weight: 700; margin-bottom: 7px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 8px;
     color: var(--modul, var(--akzent));
 }
-.card-desc { font-size: .89rem; color: var(--text-leise); line-height: 1.5; font-weight: 400; }
+.card-desc {
+    font-size: .95rem;
+    color: var(--text-leise);
+    line-height: 1.5;
+    font-weight: 400;
+}
 .card-meta {
-    margin-top: 14px; font-size: .74rem; font-weight: 600; letter-spacing: .05em;
-    text-transform: uppercase; color: #98a2b3;
+    margin-top: 14px;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #94a3b8;
 }
 
-/* Eigene Farbe je Modul */
+/* Modul-Farben */
+.menu-card[data-modul="notenwerte"]  { --modul: #0284c7; }
 .menu-card[data-modul="noten"]       { --modul: #3b5bdb; }
 .menu-card[data-modul="vorzeichen"]  { --modul: #7c3aed; }
 .menu-card[data-modul="tonleitern"]  { --modul: #0d9488; }
 .menu-card[data-modul="intervalle"]  { --modul: #ea580c; }
 .menu-card[data-modul="dreiklaenge"] { --modul: #db2777; }
 
-/* Fünf Karten gehen in keinem Raster glatt auf. Bei drei Spalten wird das
-   Einstiegsmodul doppelt so breit, bei zwei Spalten das letzte — so bleibt
-   unten rechts keine Lücke. */
-@media (min-width: 620px) and (max-width: 939px) {
-    .menu-cards { grid-template-columns: repeat(2, 1fr); }
-    .menu-card:last-child { grid-column: span 2; }
-}
-@media (min-width: 940px) {
-    .menu-cards { grid-template-columns: repeat(3, 1fr); }
-    .menu-card:first-child { grid-column: span 2; }
-}
-
-/* ------------------------------------------------------- Aufgabenfläche */
-
-.note-output, .staff-box {
-    width: 100%; margin: 0 auto; background: var(--flaeche);
-    border: 1px solid var(--rand); border-radius: var(--radius); overflow: hidden;
-}
-.note-output { max-width: 560px; height: 250px; cursor: crosshair; touch-action: none; }
-.staff-box { max-width: 900px; overflow-x: auto; }
-.staff-box svg { display: block; margin: 0 auto; }
-
-.error-note { color: var(--fehler); font-size: .8rem; margin: 6px; display: none; }
-
-.task-text { font-weight: 700; font-size: 1.2rem; margin-top: 20px; color: var(--text); }
-.feedback-text { font-weight: 600; min-height: 28px; font-size: 1.05rem; margin-top: 10px; }
-.round-info { font-size: .8rem; color: #98a2b3; margin-top: 6px; }
-
-.hint-box {
-    display: none; margin: 14px auto 0; max-width: 760px; padding: 11px 16px;
-    background: var(--akzent-hell); border: 1px solid #dbe2fe; border-radius: 10px;
-    color: #35408a; font-size: .92rem; line-height: 1.5;
-}
-
-/* Schrittschema der Tonleitern */
-.step-chain { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px; }
-.step-chain b { margin-right: 4px; color: #35408a; }
-.step { padding: 3px 10px; border-radius: 7px; background: #fff; border: 1px solid #dbe2fe;
-        color: #35408a; font-size: .86rem; }
-.step-active { background: #f59e0b; border-color: #f59e0b; color: #fff; font-weight: 700; }
-.step-arrow { color: #b4c0e8; font-size: .8rem; }
-
-/* Antwortknöpfe */
-.answer-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 20px; width: 100%; }
-.answer-btn { flex: 0 1 auto; min-width: 94px; padding: 12px 16px; font-size: 1rem; }
-.answer-grid.dense { gap: 7px; }
-.answer-grid.dense .answer-btn { min-width: 82px; padding: 11px 10px; font-size: .92rem; }
-
-/* Weiter-Knopf nach gelöster Aufgabe */
-.continue-box { display: none; margin-top: 20px; }
-.continue-btn {
-    flex: none; min-width: 190px; padding: 13px 38px; font-size: 1.05rem;
-    background: var(--erfolg); border-radius: 10px;
-    box-shadow: 0 4px 14px rgba(18, 183, 106, .25);
-}
-.continue-btn:hover { background: var(--erfolg-dunkel); }
-
-/* ---------------------------------------------------------- Klaviatur */
-
-.piano-container { display: flex; justify-content: center; margin: 22px auto 0; user-select: none; max-width: 100%; }
-.piano-key {
-    width: 42px; height: 130px; border: 1px solid #c8cdd6; border-top: none;
-    background: linear-gradient(#fff, #f2f4f7);
-    border-radius: 0 0 7px 7px; cursor: pointer;
-    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px;
-    font-weight: 600; font-size: .8rem; color: var(--text-leise);
-    position: relative; z-index: 1; margin-right: -1px;
-    transition: background .1s ease;
-    box-shadow: 0 2px 4px rgba(16, 24, 40, .08);
-}
-.piano-key:active { background: #e4e7ec; }
-.piano-key.black {
-    width: 28px; height: 80px; margin-left: -14px; margin-right: -14px; z-index: 2;
-    background: linear-gradient(#3c4250, #21262f); border: 1px solid #21262f; border-top: none;
-    color: #fff; border-radius: 0 0 5px 5px; cursor: pointer;
-    box-shadow: 0 3px 6px rgba(16, 24, 40, .35);
-}
-/* Im Noten-Modul sind die schwarzen Tasten nicht Teil der Aufgabe */
-#module-noten .piano-key.black { cursor: default; }
-
-/* Zwei Oktaven: am Stück, mittig, bei Platzmangel scrollbar */
-.piano-container.large, .piano-container.wide {
-    flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
-    width: fit-content; max-width: 100%; margin: 22px auto 0;
-}
-.piano-container.wide { display: none; padding: 4px 4px 10px; }
-.piano-container.large .piano-key, .piano-container.wide .piano-key {
-    flex: none; width: 40px; height: 140px;
-}
-.piano-container.large .piano-key.black, .piano-container.wide .piano-key.black {
-    width: 24px; height: 86px; margin-left: -12px; margin-right: -12px;
-}
-
 /* -------------------------------------------------------------- Dialoge */
 
 .modal {
-    display: none; position: fixed; z-index: 100; inset: 0;
-    background: rgba(16, 24, 40, .45); backdrop-filter: blur(2px);
-    align-items: center; justify-content: center; padding: 16px;
+    display: none;
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    background: rgba(16, 24, 40, .5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
 }
 .modal-content {
-    background: var(--flaeche); padding: 32px 30px 28px; border-radius: 18px;
-    text-align: center; box-shadow: 0 20px 50px rgba(16, 24, 40, .25);
-    max-width: 100%; width: 400px;
+    background: var(--flaeche);
+    padding: 34px 30px 30px;
+    border-radius: 22px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(16, 24, 40, .28);
+    max-width: 100%;
+    width: 420px;
 }
-.modal-content h3 { margin: 0 0 4px; color: var(--akzent); font-size: 1.3rem; }
-.grade-badge { font-size: 3.4rem; font-weight: 800; margin: 12px 0 6px; color: var(--erfolg); }
-.result-stats { font-size: 1.1rem; margin-bottom: 22px; color: var(--text-leise); }
-.modal-btn { padding: 13px 30px; border-radius: 10px; font-size: 1.05rem; width: 100%; }
+.modal-content h3 {
+    margin: 0 0 6px;
+    color: var(--akzent);
+    font-size: 1.4rem;
+}
+.grade-badge {
+    font-size: 3.6rem;
+    font-weight: 800;
+    margin: 8px 0 4px;
+    color: var(--erfolg);
+    letter-spacing: -.03em;
+}
+.result-stats {
+    font-size: 1.15rem;
+    margin-bottom: 22px;
+    color: var(--text-leise);
+    font-weight: 600;
+}
+.modal-btn {
+    padding: 14px 28px;
+    min-height: 50px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    width: 100%;
+}
 
 .unlock-input {
-    width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid var(--rand);
-    border-radius: 10px; font-size: 1.05rem; text-align: center; font-family: inherit;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 1px solid var(--rand);
+    border-radius: 12px;
+    font-size: 1.1rem;
+    text-align: center;
+    font-family: inherit;
+    touch-action: manipulation;
 }
-.unlock-input:focus { outline: none; border-color: var(--akzent); box-shadow: 0 0 0 3px rgba(59, 91, 219, .12); }
-
-@media (max-width: 640px) {
-    body { padding: 16px 10px 32px; }
-    .container { padding: 20px 16px 24px; border-radius: 16px; }
-    .module-header h2 { font-size: 1.25rem; }
-    .header-spacer { width: 0; }
-    /* Der Kopfbereich der Startseite bleibt randlos */
-    .menu-page { padding: 0 0 24px; }
-    .hero { padding: 38px 18px 32px; }
-    .hero h1 { font-size: 2.1rem; }
-    .hero-sub { font-size: .95rem; }
-    .menu-cards { padding: 20px 16px 0; gap: 12px; }
-    .card-num { font-size: 2rem; top: 14px; right: 14px; }
+.unlock-input:focus {
+    outline: none;
+    border-color: var(--akzent);
+    box-shadow: 0 0 0 3px rgba(59, 91, 219, .14);
 }
 
-/* Vorzeichen-Modul: 16 Notennamen in einem dichten Raster */
-.dense-btn { min-width: 0; padding: 11px 4px; font-size: .92rem; }
+.dense-btn {
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 4px;
+    font-size: .92rem;
+    font-weight: 600;
+}
+
+/* ------------------------------------------------ Responsive / iPad */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 14px 14px 26px;
+    }
+    .module-header h2 {
+        font-size: 1.35rem;
+    }
+    .task-text, #n-task-instruction, #v-feedback {
+        font-size: 1.18rem;
+    }
+    .note-output, .staff-box {
+        height: 135px;
+    }
+    .hero {
+        padding: 28px 16px 24px;
+    }
+    .menu-cards {
+        padding: 20px 14px 30px;
+        gap: 14px;
+    }
+    .card-num {
+        font-size: 2rem;
+    }
+    .piano-container.large .piano-key, .piano-container.wide .piano-key {
+        width: 36px;
+        height: 122px;
+    }
+    .piano-container.large .piano-key.black, .piano-container.wide .piano-key.black {
+        width: 23px;
+        height: 75px;
+        margin-left: -11.5px;
+        margin-right: -11.5px;
+    }
+}
